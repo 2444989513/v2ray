@@ -1,4 +1,8 @@
-# V2Ray 基于 Nginx 的 vmess+ws+tls 一键安装脚本 （Use Path）
+###原作者  https://github.com/wulabing/V2Ray_ws-tls_bash_onekey
+
+
+
+# V2Ray 基于 Nginx  vmess+ws+tls 一键安装脚本 （Use Path）
 ### 2019-09-19
 脚本功能性测试，已通过,目前该脚本依然可正常工作
 时间同步请保证服务器当前时间误差不要过大（24h以上）
