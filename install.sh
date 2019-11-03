@@ -352,7 +352,7 @@ acme(){
 }
 v2ray_conf_add(){
     cd /etc/v2ray
-    wget https://raw.githubusercontent.com/2444989513/V2Ray_ws-tls_bash_onekey-1/master/tls/config.json -O config.json
+    wget https://raw.githubusercontent.com/2444989513/V2ray/master/tls/config.json -O config.json
 modify_port_UUID
 judge "V2ray 配置修改"
 }
