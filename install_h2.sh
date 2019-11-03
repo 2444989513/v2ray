@@ -228,9 +228,9 @@ v2ray_conf_add(){
     rm -rf ${v2ray_conf}
     rm -rf ${client_conf}
     cd /etc/v2ray
-    wget  https://raw.githubusercontent.com/2444989513/V2Ray_ws-tls_bash_onekey/master/http2/config.json
+    wget  https://raw.githubusercontent.com/2444989513/v2ray/master/http2/config.json
     judge "config.json 下载"
-    wget  https://raw.githubusercontent.com/2444989513/V2Ray_ws-tls_bash_onekey/master/http2/client.json
+    wget  https://raw.githubusercontent.com/2444989513/v2ray/master/http2/client.json
     judge "client.json 下载"
     random_UUID
     modify_port_UUID ${v2ray_conf}
