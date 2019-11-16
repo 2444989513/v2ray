@@ -361,8 +361,7 @@ nginx_conf_add(){
     cat>${nginx_conf_dir}/v2ray.conf<<EOF
     server {
         listen 80;
-
-        listen [::]:80 ipv6only=on;
+        listen [::]:80;
         
         ssl_certificate       /data/v2ray.crt;
         ssl_certificate_key   /data/v2ray.key;
