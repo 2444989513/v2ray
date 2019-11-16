@@ -360,8 +360,10 @@ nginx_conf_add(){
     touch ${nginx_conf_dir}/v2ray.conf
     cat>${nginx_conf_dir}/v2ray.conf<<EOF
     server {
+        listen 80;
         listen 443 ssl http2;
         listen [::]:443 ssl http2;
+        listen [::]:80;
         
         ssl_certificate       /data/v2ray.crt;
         ssl_certificate_key   /data/v2ray.key;
