@@ -361,10 +361,9 @@ nginx_conf_add(){
     cat>${nginx_conf_dir}/v2ray.conf<<EOF
     server {
         listen 80;
-        listen 443 ssl http2;
-        listen [::]:443 ssl http2;
+        listen 443 ssl;
         listen [::]:80;
-        
+        listen [::]:443 ssl;
         ssl_certificate       /data/v2ray.crt;
         ssl_certificate_key   /data/v2ray.key;
         ssl_protocols         TLSv1.3;
@@ -382,14 +381,17 @@ nginx_conf_add(){
         proxy_set_header Connection "upgrade";
         proxy_set_header Host \$http_host;
         }
-
-        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
-
 }
     server {
         listen 80;
+        listen 443 ssl;
+        listen [::]:80;
+        listen [::]:443 ssl;
         server_name serveraddr.com;
         return 301 https://use.shadowsocksr.win\$request_uri;
+        
+        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
     }
 EOF
 
