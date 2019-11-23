@@ -366,7 +366,12 @@ nginx_conf_add(){
         ssl_certificate_key   /data/v2ray.key;
         ssl_protocols         TLSv1.3;
         ssl_ciphers           TLS13-AES-256-GCM-SHA384:TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-128-GCM-SHA256:TLS13-AES-128-CCM-8-SHA256:TLS13-AES-128-CCM-SHA256:EECDH+CHACHA20:EECDH+CHACHA20-draft:EECDH+ECDSA+AES128:EECDH+aRSA+AES128:RSA+AES128:EECDH+ECDSA+AES256:EECDH+aRSA+AES256:RSA+AES256:EECDH+ECDSA+3DES:EECDH+aRSA+3DES:RSA+3DES:!MD5;
+
         add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+        add_header X-Frame-Options  DENY ;
+		add_header X-Content-Type-Options  nosniff ;
+		add_header X-Xss-Protection 1;  
+        
         server_name           serveraddr.com;
         index index.html index.htm;
         root  /home/wwwroot/250;
@@ -385,7 +390,7 @@ nginx_conf_add(){
         listen 80;
         listen [::]:80;
         server_name serveraddr.com;
-        return 301 https://use.shadowsocksr.win\$request_uri;
+        return 301 https://$server_name$request_uri;
         
     }
 EOF
