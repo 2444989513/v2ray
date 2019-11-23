@@ -359,10 +359,10 @@ judge "V2ray 配置修改"
 nginx_conf_add(){
     touch ${nginx_conf_dir}/v2ray.conf
     cat>${nginx_conf_dir}/v2ray.conf<<EOF
-	 server {
+   	 server {
         listen 80;
         listen [::]:80;
-        server_name serveraddr.com www.serveraddr.com;
+        server_name serveraddr.com;
 	    return 301 https://$server_name$request_uri;
         
     }
@@ -378,8 +378,8 @@ nginx_conf_add(){
 	    add_header X-Frame-Options  DENY ;
 		add_header X-Content-Type-Options  nosniff ;
 		add_header X-Xss-Protection 1; 
-	
-        server_name           serveraddr.com www.serveraddr.com;
+		
+        server_name           serveraddr.com;
         index index.html index.htm;
         root  /home/wwwroot/250;
         error_page 400 = /400.html;
@@ -393,7 +393,6 @@ nginx_conf_add(){
         proxy_set_header Host \$http_host;
         }
 }
-   
 EOF
 
 modify_nginx
