@@ -358,15 +358,7 @@ judge "V2ray 配置修改"
 }
 nginx_conf_add(){
     touch ${nginx_conf_dir}/v2ray.conf
-    cat>${nginx_conf_dir}/v2ray.conf<<EOF
-   	 server {
-        listen 80;
-        listen [::]:80;
-        server_name serveraddr.com;
-	    return 301 https://$server_name$request_uri;
-        
-    }
-	
+    cat>${nginx_conf_dir}/v2ray.conf<<EOF	
     server {
         listen 443 ssl;
         listen [::]:443 ssl;
@@ -375,9 +367,9 @@ nginx_conf_add(){
         ssl_protocols         TLSv1.3;
         ssl_ciphers           TLS13-AES-256-GCM-SHA384:TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-128-GCM-SHA256:TLS13-AES-128-CCM-8-SHA256:TLS13-AES-128-CCM-SHA256:EECDH+CHACHA20:EECDH+CHACHA20-draft:EECDH+ECDSA+AES128:EECDH+aRSA+AES128:RSA+AES128:EECDH+ECDSA+AES256:EECDH+aRSA+AES256:RSA+AES256:EECDH+ECDSA+3DES:EECDH+aRSA+3DES:RSA+3DES:!MD5;
         add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
-	    add_header X-Frame-Options  DENY ;
-		add_header X-Content-Type-Options  nosniff ;
-		add_header X-Xss-Protection 1; 
+        add_header X-Frame-Options  DENY ;
+	add_header X-Content-Type-Options  nosniff ;
+	add_header X-Xss-Protection 1; 
 		
         server_name           serveraddr.com;
         index index.html index.htm;
@@ -393,6 +385,13 @@ nginx_conf_add(){
         proxy_set_header Host \$http_host;
         }
 }
+   	 server {
+        listen 80;
+        listen [::]:80;
+        server_name serveraddr.com;
+	    return 301 https://$server_name$request_uri;
+        
+    }
 EOF
 
 modify_nginx
