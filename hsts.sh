@@ -18,9 +18,9 @@ RedBG="\033[41;37m"
 Font="\033[0m"
 
 #notification information
-Info="${Green}[ĞÅÏ¢]${Font}"
+Info="${Green}[ä¿¡æ¯]${Font}"
 OK="${Green}[OK]${Font}"
-Error="${Red}[´íÎó]${Font}"
+Error="${Red}[é”™è¯¯]${Font}"
 
 v2ray_conf_dir="/etc/v2ray"
 nginx_conf_dir="/etc/nginx/conf/conf.d"
@@ -30,57 +30,57 @@ nginx_dir="/etc/nginx"
 nginx_openssl_src="/usr/local/src"
 nginx_version="1.16.1"
 openssl_version="1.1.1d"
-#Éú³ÉÎ±×°Â·¾¶
+#ç”Ÿæˆä¼ªè£…è·¯å¾„
 camouflage=`cat /dev/urandom | head -n 10 | md5sum | head -c 8`
 
 source /etc/os-release
 
-#´ÓVERSIONÖĞÌáÈ¡·¢ĞĞ°æÏµÍ³µÄÓ¢ÎÄÃû³Æ£¬ÎªÁËÔÚdebian/ubuntuÏÂÌí¼ÓÏà¶ÔÓ¦µÄNginx aptÔ´
+#ä»VERSIONä¸­æå–å‘è¡Œç‰ˆç³»ç»Ÿçš„è‹±æ–‡åç§°ï¼Œä¸ºäº†åœ¨debian/ubuntuä¸‹æ·»åŠ ç›¸å¯¹åº”çš„Nginx aptæº
 VERSION=`echo ${VERSION} | awk -F "[()]" '{print $2}'`
 
 check_system(){
     if [[ "${ID}" == "centos" && ${VERSION_ID} -ge 7 ]];then
-        echo -e "${OK} ${GreenBG} µ±Ç°ÏµÍ³Îª Centos ${VERSION_ID} ${VERSION} ${Font}"
+        echo -e "${OK} ${GreenBG} å½“å‰ç³»ç»Ÿä¸º Centos ${VERSION_ID} ${VERSION} ${Font}"
         INS="yum"
     elif [[ "${ID}" == "debian" && ${VERSION_ID} -ge 8 ]];then
-        echo -e "${OK} ${GreenBG} µ±Ç°ÏµÍ³Îª Debian ${VERSION_ID} ${VERSION} ${Font}"
+        echo -e "${OK} ${GreenBG} å½“å‰ç³»ç»Ÿä¸º Debian ${VERSION_ID} ${VERSION} ${Font}"
         INS="apt"
         $INS update
-        ## Ìí¼Ó Nginx aptÔ´
+        ## æ·»åŠ  Nginx aptæº
     elif [[ "${ID}" == "ubuntu" && `echo "${VERSION_ID}" | cut -d '.' -f1` -ge 16 ]];then
-        echo -e "${OK} ${GreenBG} µ±Ç°ÏµÍ³Îª Ubuntu ${VERSION_ID} ${UBUNTU_CODENAME} ${Font}"
+        echo -e "${OK} ${GreenBG} å½“å‰ç³»ç»Ÿä¸º Ubuntu ${VERSION_ID} ${UBUNTU_CODENAME} ${Font}"
         INS="apt"
         $INS update
     else
-        echo -e "${Error} ${RedBG} µ±Ç°ÏµÍ³Îª ${ID} ${VERSION_ID} ²»ÔÚÖ§³ÖµÄÏµÍ³ÁĞ±íÄÚ£¬°²×°ÖĞ¶Ï ${Font}"
+        echo -e "${Error} ${RedBG} å½“å‰ç³»ç»Ÿä¸º ${ID} ${VERSION_ID} ä¸åœ¨æ”¯æŒçš„ç³»ç»Ÿåˆ—è¡¨å†…ï¼Œå®‰è£…ä¸­æ–­ ${Font}"
         exit 1
     fi
 
     systemctl stop firewalld && systemctl disable firewalld
-    echo -e "${OK} ${GreenBG} firewalld ÒÑ¹Ø±Õ ${Font}"
+    echo -e "${OK} ${GreenBG} firewalld å·²å…³é—­ ${Font}"
 }
 
 is_root(){
     if [ `id -u` == 0 ]
-        then echo -e "${OK} ${GreenBG} µ±Ç°ÓÃ»§ÊÇrootÓÃ»§£¬½øÈë°²×°Á÷³Ì ${Font}"
+        then echo -e "${OK} ${GreenBG} å½“å‰ç”¨æˆ·æ˜¯rootç”¨æˆ·ï¼Œè¿›å…¥å®‰è£…æµç¨‹ ${Font}"
         sleep 3
     else
-        echo -e "${Error} ${RedBG} µ±Ç°ÓÃ»§²»ÊÇrootÓÃ»§£¬ÇëÇĞ»»µ½rootÓÃ»§ºóÖØĞÂÖ´ĞĞ½Å±¾ ${Font}" 
+        echo -e "${Error} ${RedBG} å½“å‰ç”¨æˆ·ä¸æ˜¯rootç”¨æˆ·ï¼Œè¯·åˆ‡æ¢åˆ°rootç”¨æˆ·åé‡æ–°æ‰§è¡Œè„šæœ¬ ${Font}" 
         exit 1
     fi
 }
 judge(){
     if [[ $? -eq 0 ]];then
-        echo -e "${OK} ${GreenBG} $1 Íê³É ${Font}"
+        echo -e "${OK} ${GreenBG} $1 å®Œæˆ ${Font}"
         sleep 1
     else
-        echo -e "${Error} ${RedBG} $1 Ê§°Ü${Font}"
+        echo -e "${Error} ${RedBG} $1 å¤±è´¥${Font}"
         exit 1
     fi
 }
 chrony_install(){
     ${INS} -y install chrony
-    judge "°²×° chrony Ê±¼äÍ¬²½·şÎñ "
+    judge "å®‰è£… chrony æ—¶é—´åŒæ­¥æœåŠ¡ "
 
     timedatectl set-ntp true
 
@@ -90,25 +90,25 @@ chrony_install(){
        systemctl enable chrony && systemctl restart chrony
     fi
 
-    judge "chronyd Æô¶¯ "
+    judge "chronyd å¯åŠ¨ "
 
     timedatectl set-timezone Asia/Shanghai
 
-    echo -e "${OK} ${GreenBG} µÈ´ıÊ±¼äÍ¬²½ ${Font}"
+    echo -e "${OK} ${GreenBG} ç­‰å¾…æ—¶é—´åŒæ­¥ ${Font}"
     sleep 10
 
     chronyc sourcestats -v
     chronyc tracking -v
     date
-    read -p "ÇëÈ·ÈÏÊ±¼äÊÇ·ñ×¼È·,Îó²î·¶Î§¡À3·ÖÖÓ(Y/N): " chrony_install
+    read -p "è¯·ç¡®è®¤æ—¶é—´æ˜¯å¦å‡†ç¡®,è¯¯å·®èŒƒå›´Â±3åˆ†é’Ÿ(Y/N): " chrony_install
     [[ -z ${chrony_install} ]] && chrony_install="Y"
     case $chrony_install in
         [yY][eE][sS]|[yY])
-            echo -e "${GreenBG} ¼ÌĞø°²×° ${Font}"
+            echo -e "${GreenBG} ç»§ç»­å®‰è£… ${Font}"
             sleep 2
             ;;
         *)
-            echo -e "${RedBG} °²×°ÖÕÖ¹ ${Font}"
+            echo -e "${RedBG} å®‰è£…ç»ˆæ­¢ ${Font}"
             exit 2
             ;;
         esac
@@ -122,7 +122,7 @@ dependency_install(){
     else
        ${INS} -y install cron
     fi
-    judge "°²×° crontab"
+    judge "å®‰è£… crontab"
 
     if [[ "${ID}" == "centos" ]];then
        touch /var/spool/cron/root && chmod 600 /var/spool/cron/root
@@ -132,25 +132,25 @@ dependency_install(){
        systemctl start cron && systemctl enable cron
 
     fi
-    judge "crontab ×ÔÆô¶¯ÅäÖÃ "
+    judge "crontab è‡ªå¯åŠ¨é…ç½® "
 
 
 
     ${INS} -y install bc
-    judge "°²×° bc"
+    judge "å®‰è£… bc"
 
     ${INS} -y install unzip
-    judge "°²×° unzip"
+    judge "å®‰è£… unzip"
 
     ${INS} -y install qrencode
-    judge "°²×° qrencode"
+    judge "å®‰è£… qrencode"
 
     if [[ "${ID}" == "centos" ]];then
        ${INS} -y groupinstall "Development tools"
     else
        ${INS} -y install build-essential
     fi
-    judge "±àÒë¹¤¾ß°ü °²×°"
+    judge "ç¼–è¯‘å·¥å…·åŒ… å®‰è£…"
 
     if [[ "${ID}" == "centos" ]];then
        ${INS} -y install pcre pcre-devel zlib-devel
@@ -159,17 +159,17 @@ dependency_install(){
     fi
 
 
-    judge "nginx ±àÒëÒÀÀµ°²×°"
+    judge "nginx ç¼–è¯‘ä¾èµ–å®‰è£…"
 
 }
 basic_optimization(){
-    # ×î´óÎÄ¼ş´ò¿ªÊı
+    # æœ€å¤§æ–‡ä»¶æ‰“å¼€æ•°
     sed -i '/^\*\ *soft\ *nofile\ *[[:digit:]]*/d' /etc/security/limits.conf
     sed -i '/^\*\ *hard\ *nofile\ *[[:digit:]]*/d' /etc/security/limits.conf
     echo '* soft nofile 65536' >> /etc/security/limits.conf
     echo '* hard nofile 65536' >> /etc/security/limits.conf
 
-    # ¹Ø±Õ Selinux
+    # å…³é—­ Selinux
     if [[ "${ID}" == "centos" ]];then
         sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/selinux/config
         setenforce 0
@@ -177,9 +177,9 @@ basic_optimization(){
 
 }
 port_alterid_set(){
-    read -p "ÇëÊäÈëÁ¬½Ó¶Ë¿Ú£¨default:443£©:" port
+    read -p "è¯·è¾“å…¥è¿æ¥ç«¯å£ï¼ˆdefault:443ï¼‰:" port
     [[ -z ${port} ]] && port="443"
-    read -p "ÇëÊäÈëalterID£¨default:4£©:" alterID
+    read -p "è¯·è¾“å…¥alterIDï¼ˆdefault:4ï¼‰:" alterID
     [[ -z ${alterID} ]] && alterID="4"
 }
 modify_port_UUID(){
@@ -199,10 +199,10 @@ modify_nginx(){
     sed -i "27i \\\tproxy_intercept_errors on;"  ${nginx_dir}/conf/nginx.conf
 }
 web_camouflage(){
-    ##Çë×¢Òâ ÕâÀïºÍLNMP½Å±¾µÄÄ¬ÈÏÂ·¾¶³åÍ»£¬Ç§Íò²»ÒªÔÚ°²×°ÁËLNMPµÄ»·¾³ÏÂÊ¹ÓÃ±¾½Å±¾£¬·ñÔòºó¹û×Ô¸º
+    ##è¯·æ³¨æ„ è¿™é‡Œå’ŒLNMPè„šæœ¬çš„é»˜è®¤è·¯å¾„å†²çªï¼Œåƒä¸‡ä¸è¦åœ¨å®‰è£…äº†LNMPçš„ç¯å¢ƒä¸‹ä½¿ç”¨æœ¬è„šæœ¬ï¼Œå¦åˆ™åæœè‡ªè´Ÿ
     rm -rf /home/wwwroot && mkdir -p /home/wwwroot && cd /home/wwwroot
     git clone https://github.com/2444989513/250.git
-    judge "web Õ¾µãÎ±×°"   
+    judge "web ç«™ç‚¹ä¼ªè£…"   
 }
 v2ray_install(){
     if [[ -d /root/v2ray ]];then
@@ -218,12 +218,12 @@ v2ray_install(){
     
     if [[ -f go.sh ]];then
         bash go.sh --force
-        judge "°²×° V2ray"
+        judge "å®‰è£… V2ray"
     else
-        echo -e "${Error} ${RedBG} V2ray °²×°ÎÄ¼şÏÂÔØÊ§°Ü£¬Çë¼ì²éÏÂÔØµØÖ·ÊÇ·ñ¿ÉÓÃ ${Font}"
+        echo -e "${Error} ${RedBG} V2ray å®‰è£…æ–‡ä»¶ä¸‹è½½å¤±è´¥ï¼Œè¯·æ£€æŸ¥ä¸‹è½½åœ°å€æ˜¯å¦å¯ç”¨ ${Font}"
         exit 4
     fi
-    # Çå³ıÁÙÊ±ÎÄ¼ş
+    # æ¸…é™¤ä¸´æ—¶æ–‡ä»¶
     rm -rf /root/v2ray
 }
 nginx_install(){
@@ -232,9 +232,9 @@ nginx_install(){
     fi
 
     wget -nc http://nginx.org/download/nginx-${nginx_version}.tar.gz -P ${nginx_openssl_src}
-    judge "Nginx ÏÂÔØ"
+    judge "Nginx ä¸‹è½½"
     wget -nc https://www.openssl.org/source/openssl-${openssl_version}.tar.gz -P ${nginx_openssl_src}
-    judge "openssl ÏÂÔØ"
+    judge "openssl ä¸‹è½½"
 
     cd ${nginx_openssl_src}
 
@@ -246,7 +246,7 @@ nginx_install(){
 
     [[ -d "$nginx_dir" ]] && rm -rf ${nginx_dir}
 
-    echo -e "${OK} ${GreenBG} ¼´½«¿ªÊ¼±àÒë°²×° Nginx, ¹ı³ÌÉÔ¾Ã£¬ÇëÄÍĞÄµÈ´ı ${Font}"
+    echo -e "${OK} ${GreenBG} å³å°†å¼€å§‹ç¼–è¯‘å®‰è£… Nginx, è¿‡ç¨‹ç¨ä¹…ï¼Œè¯·è€å¿ƒç­‰å¾… ${Font}"
     sleep 4
 
     cd nginx-${nginx_version}
@@ -261,11 +261,11 @@ nginx_install(){
             --with-http_secure_link_module                      \
             --with-http_v2_module                               \
             --with-openssl=../openssl-"$openssl_version"
-    judge "±àÒë¼ì²é"
+    judge "ç¼–è¯‘æ£€æŸ¥"
     make && make install
-    judge "Nginx ±àÒë°²×°"
+    judge "Nginx ç¼–è¯‘å®‰è£…"
 
-    # ĞŞ¸Ä»ù±¾ÅäÖÃ
+    # ä¿®æ”¹åŸºæœ¬é…ç½®
     sed -i 's/#user  nobody;/user  root;/' ${nginx_dir}/conf/nginx.conf
     sed -i 's/worker_processes  1;/worker_processes  3;/' ${nginx_dir}/conf/nginx.conf
     sed -i 's/    worker_connections  1024;/    worker_connections  4096;/' ${nginx_dir}/conf/nginx.conf
@@ -273,13 +273,13 @@ nginx_install(){
 
 
 
-    # É¾³ıÁÙÊ±ÎÄ¼ş
+    # åˆ é™¤ä¸´æ—¶æ–‡ä»¶
     rm -rf nginx-"${nginx_version}"
     rm -rf openssl-"${openssl_version}"
     rm -rf ../nginx-"${nginx_version}".tar.gz
     rm -rf ../openssl-"${openssl_version}".tar.gz
 
-    # Ìí¼ÓÅäÖÃÎÄ¼ş¼Ğ£¬ÊÊÅä¾É°æ½Å±¾
+    # æ·»åŠ é…ç½®æ–‡ä»¶å¤¹ï¼Œé€‚é…æ—§ç‰ˆè„šæœ¬
     mkdir ${nginx_dir}/conf/conf.d
 }
 ssl_install(){
@@ -288,32 +288,32 @@ ssl_install(){
     else
         ${INS} install socat netcat -y
     fi
-    judge "°²×° SSL Ö¤ÊéÉú³É½Å±¾ÒÀÀµ"
+    judge "å®‰è£… SSL è¯ä¹¦ç”Ÿæˆè„šæœ¬ä¾èµ–"
 
     curl  https://get.acme.sh | sh
-    judge "°²×° SSL Ö¤ÊéÉú³É½Å±¾"
+    judge "å®‰è£… SSL è¯ä¹¦ç”Ÿæˆè„šæœ¬"
 }
 domain_check(){
-    read -p "ÇëÊäÈëÄãµÄÓòÃûĞÅÏ¢(eg:www.wulabing.com):" domain
+    read -p "è¯·è¾“å…¥ä½ çš„åŸŸåä¿¡æ¯(eg:www.wulabing.com):" domain
     domain_ip=`ping ${domain} -c 1 | sed '1{s/[^(]*(//;s/).*//;q}'`
-    echo -e "${OK} ${GreenBG} ÕıÔÚ»ñÈ¡ ¹«Íøip ĞÅÏ¢£¬ÇëÄÍĞÄµÈ´ı ${Font}"
+    echo -e "${OK} ${GreenBG} æ­£åœ¨è·å– å…¬ç½‘ip ä¿¡æ¯ï¼Œè¯·è€å¿ƒç­‰å¾… ${Font}"
     local_ip=`curl -4 ip.sb`
-    echo -e "ÓòÃûdns½âÎöIP£º${domain_ip}"
-    echo -e "±¾»úIP: ${local_ip}"
+    echo -e "åŸŸådnsè§£æIPï¼š${domain_ip}"
+    echo -e "æœ¬æœºIP: ${local_ip}"
     sleep 2
     if [[ $(echo ${local_ip}|tr '.' '+'|bc) -eq $(echo ${domain_ip}|tr '.' '+'|bc) ]];then
-        echo -e "${OK} ${GreenBG} ÓòÃûdns½âÎöIP  Óë ±¾»úIP Æ¥Åä ${Font}"
+        echo -e "${OK} ${GreenBG} åŸŸådnsè§£æIP  ä¸ æœ¬æœºIP åŒ¹é… ${Font}"
         sleep 2
     else
-        echo -e "${Error} ${RedBG} ÇëÈ·±£ÓòÃûÌí¼ÓÁËÕıÈ·µÄ A ¼ÇÂ¼£¬·ñÔò½«ÎŞ·¨Õı³£Ê¹ÓÃ V2ray"
-        echo -e "${Error} ${RedBG} ÓòÃûdns½âÎöIP Óë ±¾»úIP ²»Æ¥Åä ÊÇ·ñ¼ÌĞø°²×°£¿£¨y/n£©${Font}" && read install
+        echo -e "${Error} ${RedBG} è¯·ç¡®ä¿åŸŸåæ·»åŠ äº†æ­£ç¡®çš„ A è®°å½•ï¼Œå¦åˆ™å°†æ— æ³•æ­£å¸¸ä½¿ç”¨ V2ray"
+        echo -e "${Error} ${RedBG} åŸŸådnsè§£æIP ä¸ æœ¬æœºIP ä¸åŒ¹é… æ˜¯å¦ç»§ç»­å®‰è£…ï¼Ÿï¼ˆy/nï¼‰${Font}" && read install
         case $install in
         [yY][eE][sS]|[yY])
-            echo -e "${GreenBG} ¼ÌĞø°²×° ${Font}" 
+            echo -e "${GreenBG} ç»§ç»­å®‰è£… ${Font}" 
             sleep 2
             ;;
         *)
-            echo -e "${RedBG} °²×°ÖÕÖ¹ ${Font}" 
+            echo -e "${RedBG} å®‰è£…ç»ˆæ­¢ ${Font}" 
             exit 2
             ;;
         esac
@@ -322,31 +322,31 @@ domain_check(){
 
 port_exist_check(){
     if [[ 0 -eq `lsof -i:"$1" | grep -i "listen" | wc -l` ]];then
-        echo -e "${OK} ${GreenBG} $1 ¶Ë¿ÚÎ´±»Õ¼ÓÃ ${Font}"
+        echo -e "${OK} ${GreenBG} $1 ç«¯å£æœªè¢«å ç”¨ ${Font}"
         sleep 1
     else
-        echo -e "${Error} ${RedBG} ¼ì²âµ½ $1 ¶Ë¿Ú±»Õ¼ÓÃ£¬ÒÔÏÂÎª $1 ¶Ë¿ÚÕ¼ÓÃĞÅÏ¢ ${Font}"
+        echo -e "${Error} ${RedBG} æ£€æµ‹åˆ° $1 ç«¯å£è¢«å ç”¨ï¼Œä»¥ä¸‹ä¸º $1 ç«¯å£å ç”¨ä¿¡æ¯ ${Font}"
         lsof -i:"$1"
-        echo -e "${OK} ${GreenBG} 5s ºó½«³¢ÊÔ×Ô¶¯ kill Õ¼ÓÃ½ø³Ì ${Font}"
+        echo -e "${OK} ${GreenBG} 5s åå°†å°è¯•è‡ªåŠ¨ kill å ç”¨è¿›ç¨‹ ${Font}"
         sleep 5
         lsof -i:"$1" | awk '{print $2}'| grep -v "PID" | xargs kill -9
-        echo -e "${OK} ${GreenBG} kill Íê³É ${Font}"
+        echo -e "${OK} ${GreenBG} kill å®Œæˆ ${Font}"
         sleep 1
     fi
 }
 acme(){
     ~/.acme.sh/acme.sh --issue -d ${domain} --standalone -k ec-256 --force
     if [[ $? -eq 0 ]];then
-        echo -e "${OK} ${GreenBG} SSL Ö¤ÊéÉú³É³É¹¦ ${Font}"
+        echo -e "${OK} ${GreenBG} SSL è¯ä¹¦ç”ŸæˆæˆåŠŸ ${Font}"
         sleep 2
         mkdir /data
         ~/.acme.sh/acme.sh --installcert -d ${domain} --fullchainpath /data/v2ray.crt --keypath /data/v2ray.key --ecc
         if [[ $? -eq 0 ]];then
-        echo -e "${OK} ${GreenBG} Ö¤ÊéÅäÖÃ³É¹¦ ${Font}"
+        echo -e "${OK} ${GreenBG} è¯ä¹¦é…ç½®æˆåŠŸ ${Font}"
         sleep 2
         fi
     else
-        echo -e "${Error} ${RedBG} SSL Ö¤ÊéÉú³ÉÊ§°Ü ${Font}"
+        echo -e "${Error} ${RedBG} SSL è¯ä¹¦ç”Ÿæˆå¤±è´¥ ${Font}"
         exit 1
     fi
 }
@@ -354,7 +354,7 @@ v2ray_conf_add(){
     cd /etc/v2ray
     wget https://raw.githubusercontent.com/2444989513/V2ray/master/tls/config.json -O config.json
 modify_port_UUID
-judge "V2ray ÅäÖÃĞŞ¸Ä"
+judge "V2ray é…ç½®ä¿®æ”¹"
 }
 nginx_conf_add(){
     touch ${nginx_conf_dir}/v2ray.conf
@@ -378,7 +378,7 @@ nginx_conf_add(){
 	    add_header X-Frame-Options  DENY ;
 		add_header X-Content-Type-Options  nosniff ;
 		add_header X-Xss-Protection 1; 
-		
+	
         server_name           serveraddr.com www.serveraddr.com;
         index index.html index.htm;
         root  /home/wwwroot/250;
@@ -397,26 +397,26 @@ nginx_conf_add(){
 EOF
 
 modify_nginx
-judge "Nginx ÅäÖÃĞŞ¸Ä"
+judge "Nginx é…ç½®ä¿®æ”¹"
 
 }
 
 start_process_systemd(){
-    ### nginx·şÎñÔÚ°²×°Íê³Éºó»á×Ô¶¯Æô¶¯¡£ĞèÒªÍ¨¹ırestart»òreloadÖØĞÂ¼ÓÔØÅäÖÃ
+    ### nginxæœåŠ¡åœ¨å®‰è£…å®Œæˆåä¼šè‡ªåŠ¨å¯åŠ¨ã€‚éœ€è¦é€šè¿‡restartæˆ–reloadé‡æ–°åŠ è½½é…ç½®
     systemctl restart nginx
-    judge "Nginx Æô¶¯"
+    judge "Nginx å¯åŠ¨"
 
     systemctl enable nginx
-    judge "ÉèÖÃ Nginx ¿ª»ú×ÔÆô"
+    judge "è®¾ç½® Nginx å¼€æœºè‡ªå¯"
 
     systemctl restart v2ray
-    judge "V2ray Æô¶¯"
+    judge "V2ray å¯åŠ¨"
 
     systemctl enable v2ray
-    judge "ÉèÖÃ v2ray ¿ª»ú×ÔÆô"
+    judge "è®¾ç½® v2ray å¼€æœºè‡ªå¯"
 }
 
-#debian Ïµ 9 10 ÊÊÅä
+#debian ç³» 9 10 é€‚é…
 #rc_local_initialization(){
 #    if [[ -f /etc/rc.local ]];then
 #        chmod +x /etc/rc.local
@@ -426,7 +426,7 @@ start_process_systemd(){
 #        systemctl start rc-local
 #    fi
 #
-#    judge "rc.local ÅäÖÃ"
+#    judge "rc.local é…ç½®"
 #}
 acme_cron_update(){
     if [[ "${ID}" == "centos" ]];then
@@ -436,7 +436,7 @@ acme_cron_update(){
         sed -i "/acme.sh/c 0 0 * * 0 systemctl stop nginx && \"/root/.acme.sh\"/acme.sh --cron --home \"/root/.acme.sh\" \
         > /dev/null && systemctl start nginx" /var/spool/cron/crontabs/root
     fi
-    judge "cron ¼Æ»®ÈÎÎñ¸üĞÂ"
+    judge "cron è®¡åˆ’ä»»åŠ¡æ›´æ–°"
 }
 
 vmess_qr_config(){
@@ -457,8 +457,8 @@ vmess_qr_config(){
 EOF
 
     vmess_link="vmess://$(cat /etc/v2ray/vmess_qr.json | base64 -w 0)"
-    echo -e "${Red} URLµ¼ÈëÁ´½Ó:${vmess_link} ${Font}" >>./v2ray_info.txt
-    echo -e "${Red} ¶şÎ¬Âë: ${Font}" >>./v2ray_info.txt
+    echo -e "${Red} URLå¯¼å…¥é“¾æ¥:${vmess_link} ${Font}" >>./v2ray_info.txt
+    echo -e "${Red} äºŒç»´ç : ${Font}" >>./v2ray_info.txt
     echo "${vmess_link}"| qrencode -o - -t utf8 >>./v2ray_info.txt
 }
 
@@ -466,28 +466,28 @@ show_information(){
     clear
     cd ~
 
-    echo -e "${OK} ${Green} V2ray+ws+tls °²×°³É¹¦" >./v2ray_info.txt
-    echo -e "${Red} V2ray ÅäÖÃĞÅÏ¢ ${Font}" >>./v2ray_info.txt
-    echo -e "${Red} µØÖ·£¨address£©:${Font} ${domain} " >>./v2ray_info.txt
-    echo -e "${Red} ¶Ë¿Ú£¨port£©£º${Font} ${port} " >>./v2ray_info.txt
-    echo -e "${Red} ÓÃ»§id£¨UUID£©£º${Font} ${UUID}" >>./v2ray_info.txt
-    echo -e "${Red} ¶îÍâid£¨alterId£©£º${Font} ${alterID}" >>./v2ray_info.txt
-    echo -e "${Red} ¼ÓÃÜ·½Ê½£¨security£©£º${Font} ×ÔÊÊÓ¦ " >>./v2ray_info.txt
-    echo -e "${Red} ´«ÊäĞ­Òé£¨network£©£º${Font} ws " >>./v2ray_info.txt
-    echo -e "${Red} Î±×°ÀàĞÍ£¨type£©£º${Font} none " >>./v2ray_info.txt
-    echo -e "${Red} Â·¾¶£¨²»ÒªÂäÏÂ/£©£º${Font} /${camouflage}/ " >>./v2ray_info.txt
-    echo -e "${Red} µ×²ã´«Êä°²È«£º${Font} tls " >>./v2ray_info.txt
+    echo -e "${OK} ${Green} V2ray+ws+tls å®‰è£…æˆåŠŸ" >./v2ray_info.txt
+    echo -e "${Red} V2ray é…ç½®ä¿¡æ¯ ${Font}" >>./v2ray_info.txt
+    echo -e "${Red} åœ°å€ï¼ˆaddressï¼‰:${Font} ${domain} " >>./v2ray_info.txt
+    echo -e "${Red} ç«¯å£ï¼ˆportï¼‰ï¼š${Font} ${port} " >>./v2ray_info.txt
+    echo -e "${Red} ç”¨æˆ·idï¼ˆUUIDï¼‰ï¼š${Font} ${UUID}" >>./v2ray_info.txt
+    echo -e "${Red} é¢å¤–idï¼ˆalterIdï¼‰ï¼š${Font} ${alterID}" >>./v2ray_info.txt
+    echo -e "${Red} åŠ å¯†æ–¹å¼ï¼ˆsecurityï¼‰ï¼š${Font} è‡ªé€‚åº” " >>./v2ray_info.txt
+    echo -e "${Red} ä¼ è¾“åè®®ï¼ˆnetworkï¼‰ï¼š${Font} ws " >>./v2ray_info.txt
+    echo -e "${Red} ä¼ªè£…ç±»å‹ï¼ˆtypeï¼‰ï¼š${Font} none " >>./v2ray_info.txt
+    echo -e "${Red} è·¯å¾„ï¼ˆä¸è¦è½ä¸‹/ï¼‰ï¼š${Font} /${camouflage}/ " >>./v2ray_info.txt
+    echo -e "${Red} åº•å±‚ä¼ è¾“å®‰å…¨ï¼š${Font} tls " >>./v2ray_info.txt
     vmess_qr_config
     cat ./v2ray_info.txt
 
 }
 ssl_judge_and_install(){
     if [[ -f "/data/v2ray.key" && -f "/data/v2ray.crt" ]];then
-        echo "Ö¤ÊéÎÄ¼şÒÑ´æÔÚ"
+        echo "è¯ä¹¦æ–‡ä»¶å·²å­˜åœ¨"
     elif [[ -f "~/.acme.sh/${domain}_ecc/${domain}.key" && -f "~/.acme.sh/${domain}_ecc/${domain}.cer" ]];then
-        echo "Ö¤ÊéÎÄ¼şÒÑ´æÔÚ"
+        echo "è¯ä¹¦æ–‡ä»¶å·²å­˜åœ¨"
         ~/.acme.sh/acme.sh --installcert -d ${domain} --fullchainpath /data/v2ray.crt --keypath /data/v2ray.key --ecc
-        judge "Ö¤ÊéÓ¦ÓÃ"
+        judge "è¯ä¹¦åº”ç”¨"
     else
         ssl_install
         acme
@@ -510,7 +510,7 @@ PrivateTmp=true
 WantedBy=multi-user.target
 EOF
 
-judge "Nginx systemd ServerFile Ìí¼Ó"
+judge "Nginx systemd ServerFile æ·»åŠ "
 }
 main(){
     is_root
@@ -528,7 +528,7 @@ main(){
     nginx_conf_add
     web_camouflage
 
-    #½«Ö¤ÊéÉú³É·ÅÔÚ×îºó£¬¾¡Á¿±ÜÃâ¶à´Î³¢ÊÔ½Å±¾´Ó¶øÔì³ÉµÄ¶à´ÎÖ¤ÊéÉêÇë
+    #å°†è¯ä¹¦ç”Ÿæˆæ”¾åœ¨æœ€åï¼Œå°½é‡é¿å…å¤šæ¬¡å°è¯•è„šæœ¬ä»è€Œé€ æˆçš„å¤šæ¬¡è¯ä¹¦ç”³è¯·
     ssl_judge_and_install
     nginx_systemd
     show_information
