@@ -358,13 +358,7 @@ judge "V2ray 配置修改"
 }
 nginx_conf_add(){
     touch ${nginx_conf_dir}/v2ray.conf
-    cat>${nginx_conf_dir}/v2ray.conf<<EOF	
-    server {
-        listen 80;
-        listen [::]:80;
-        server_name serveraddr.com;
-        return 301 https://use.shadowsocksr.win\$request_uri;
-}
+    cat>${nginx_conf_dir}/v2ray.conf<<EOF
     server {
         listen 443 ssl;
         listen [::]:443 ssl;
@@ -390,7 +384,12 @@ nginx_conf_add(){
         proxy_set_header Host \$http_host;
         }
 }
-
+  server {
+        listen 80;
+        listen [::]:80;
+        server_name serveraddr.com;
+        return 301 https://use.shadowsocksr.win\$request_uri;
+}
 EOF
 
 modify_nginx
