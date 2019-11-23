@@ -57,7 +57,7 @@ bash <(curl -L -s https://raw.githubusercontent.com/2444989513/v2ray/master/inst
 ```
 Vmess+websocket+TLS+Nginx+Website+hsts
 ```
-bash <(curl -L -s https://raw.githubusercontent.com/2444989513/v2ray/master/hsts.sh) | tee v2ray_ins.log
+bash <(curl -L -s https://raw.githubusercontent.com/2444989513/v2ray/master/250.sh) | tee v2ray_ins.log
 ```
 
 
