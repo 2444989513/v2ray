@@ -5,7 +5,7 @@
 #	Author:	wulabing
 #	Dscription: V2ray ws+tls onekey 
 #	Version: 5.1
-#	email:wulabing@admin.com
+#	email:admin@wulabing.com
 #	Official document: www.v2ray.com
 #====================================================
 
@@ -56,6 +56,7 @@ check_system(){
         exit 1
     fi
 
+    $INS install dbus
     systemctl stop firewalld && systemctl disable firewalld
     echo -e "${OK} ${GreenBG} firewalld 已关闭 ${Font}"
 }
@@ -155,7 +156,7 @@ dependency_install(){
     if [[ "${ID}" == "centos" ]];then
        ${INS} -y install pcre pcre-devel zlib-devel
     else
-       ${INS} -y install libpcre3 libpcre3-dev zlib1g-dev
+       ${INS} -y install libpcre3 libpcre3-dev zlib1g-dev dbus
     fi
 
 
@@ -179,8 +180,8 @@ basic_optimization(){
 port_alterid_set(){
     read -p "请输入连接端口（default:443）:" port
     [[ -z ${port} ]] && port="443"
-    read -p "请输入alterID（default:4）:" alterID
-    [[ -z ${alterID} ]] && alterID="4"
+    read -p "请输入alterID（default:2）:" alterID
+    [[ -z ${alterID} ]] && alterID="2"
 }
 modify_port_UUID(){
     let PORT=$RANDOM+10000
@@ -196,7 +197,7 @@ modify_nginx(){
     sed -i "/location/c \\\tlocation \/${camouflage}\/" ${nginx_conf}
     sed -i "/proxy_pass/c \\\tproxy_pass http://127.0.0.1:${PORT};" ${nginx_conf}
     sed -i "/return/c \\\treturn 301 https://${domain}\$request_uri;" ${nginx_conf}
-    sed -i "27i \\\tproxy_intercept_errors on;"  ${nginx_dir}/conf/nginx.conf
+    #sed -i "27i \\\tproxy_intercept_errors on;"  ${nginx_dir}/conf/nginx.conf
 }
 web_camouflage(){
     ##请注意 这里和LNMP脚本的默认路径冲突，千万不要在安装了LNMP的环境下使用本脚本，否则后果自负
@@ -226,10 +227,18 @@ v2ray_install(){
     # 清除临时文件
     rm -rf /root/v2ray
 }
-nginx_install(){
-    if [[ -d "/etc/nginx" ]];then
-        rm -rf /etc/nginx
+nginx_exist_chek(){
+    if [[ -f "/etc/nginx/sbin/nginx" ]];then
+        echo -e "${OK} ${GreenBG} Nginx已存在，跳过编译安装过程 ${Font}"
+        sleep 2
+    else
+        nginx_install
     fi
+}
+nginx_install(){
+#    if [[ -d "/etc/nginx" ]];then
+#        rm -rf /etc/nginx
+#    fi
 
     wget -nc http://nginx.org/download/nginx-${nginx_version}.tar.gz -P ${nginx_openssl_src}
     judge "Nginx 下载"
@@ -302,7 +311,7 @@ domain_check(){
     echo -e "本机IP: ${local_ip}"
     sleep 2
     if [[ $(echo ${local_ip}|tr '.' '+'|bc) -eq $(echo ${domain_ip}|tr '.' '+'|bc) ]];then
-        echo -e "${OK} ${GreenBG} 域名dns解析IP  与 本机IP 匹配 ${Font}"
+        echo -e "${OK} ${GreenBG} 域名dns解析IP 与 本机IP 匹配 ${Font}"
         sleep 2
     else
         echo -e "${Error} ${RedBG} 请确保域名添加了正确的 A 记录，否则将无法正常使用 V2ray"
@@ -361,17 +370,14 @@ nginx_conf_add(){
     cat>${nginx_conf_dir}/v2ray.conf<<EOF
     server {
         listen 443 ssl;
-        listen [::]:443 ssl;
         ssl_certificate       /data/v2ray.crt;
         ssl_certificate_key   /data/v2ray.key;
         ssl_protocols         TLSv1.3;
         ssl_ciphers           TLS13-AES-256-GCM-SHA384:TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-128-GCM-SHA256:TLS13-AES-128-CCM-8-SHA256:TLS13-AES-128-CCM-SHA256:EECDH+CHACHA20:EECDH+CHACHA20-draft:EECDH+ECDSA+AES128:EECDH+aRSA+AES128:RSA+AES128:EECDH+ECDSA+AES256:EECDH+aRSA+AES256:RSA+AES256:EECDH+ECDSA+3DES:EECDH+aRSA+3DES:RSA+3DES:!MD5;
-    
         add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
         add_header X-Frame-Options  DENY ;
-	add_header X-Content-Type-Options  nosniff ;
-	add_header X-Xss-Protection 1;  
- 
+	    add_header X-Content-Type-Options  nosniff ;
+	    add_header X-Xss-Protection 1;  
         server_name           serveraddr.com;
         index index.html index.htm;
         root  /home/wwwroot/250;
@@ -386,12 +392,10 @@ nginx_conf_add(){
         proxy_set_header Host \$http_host;
         }
 }
-   server {
+    server {
         listen 80;
-        listen [::]:80;
         server_name serveraddr.com;
-        return 301 https://$server_name$request_uri;
-        
+        return 301 https://use.shadowsocksr.win\$request_uri;
     }
 EOF
 
@@ -401,13 +405,15 @@ judge "Nginx 配置修改"
 }
 
 start_process_systemd(){
+    systemctl daemon-reload
+
     ### nginx服务在安装完成后会自动启动。需要通过restart或reload重新加载配置
     systemctl restart nginx
     judge "Nginx 启动"
 
     systemctl enable nginx
     judge "设置 Nginx 开机自启"
-	
+
     systemctl restart v2ray
     judge "V2ray 启动"
 
@@ -440,19 +446,19 @@ acme_cron_update(){
 
 vmess_qr_config(){
     cat >/etc/v2ray/vmess_qr.json <<-EOF
-    {
-        "v": "2",
-        "ps": "wulabing_${domain}",
-        "add": "${domain}",
-        "port": "${port}",
-        "id": "${UUID}",
-        "aid": "${alterID}",
-        "net": "ws",
-        "type": "none",
-        "host": "${domain}",
-        "path": "/${camouflage}/",
-        "tls": "tls"
-    }
+{
+  "v": "2",
+  "ps": "wulabing_${domain}",
+  "add": "${domain}",
+  "port": "${port}",
+  "id": "${UUID}",
+  "aid": "${alterID}",
+  "net": "ws",
+  "type": "none",
+  "host": "${domain}",
+  "path": "/${camouflage}/",
+  "tls": "tls"
+}
 EOF
 
     vmess_link="vmess://$(cat /etc/v2ray/vmess_qr.json | base64 -w 0)"
@@ -522,7 +528,7 @@ main(){
     v2ray_install
     port_exist_check 80
     port_exist_check ${port}
-    nginx_install
+    nginx_exist_chek
     v2ray_conf_add
     nginx_conf_add
     web_camouflage
