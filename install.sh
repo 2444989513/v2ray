@@ -180,7 +180,7 @@ basic_optimization(){
 port_alterid_set(){
     read -p "请输入连接端口（default:443）:" port
     [[ -z ${port} ]] && port="443"
-    read -p "请输入alterID（default:2）:" alterID
+    read -p "请输入alterID（default:2 仅允许填数字）:" alterID
     [[ -z ${alterID} ]] && alterID="2"
 }
 modify_port_UUID(){
@@ -202,7 +202,7 @@ modify_nginx(){
 web_camouflage(){
     ##请注意 这里和LNMP脚本的默认路径冲突，千万不要在安装了LNMP的环境下使用本脚本，否则后果自负
     rm -rf /home/wwwroot && mkdir -p /home/wwwroot && cd /home/wwwroot
-    git clone https://github.com/2444989513/250.git
+    git clone https://github.com/2444989513/2444989513.github.io.git
     judge "web 站点伪装"   
 }
 v2ray_install(){
@@ -368,19 +368,19 @@ judge "V2ray 配置修改"
 nginx_conf_add(){
     touch ${nginx_conf_dir}/v2ray.conf
     cat>${nginx_conf_dir}/v2ray.conf<<EOF
-    server {
-        listen 443 ssl;
+server {
+        listen 443 ssl http2;
         ssl_certificate       /data/v2ray.crt;
         ssl_certificate_key   /data/v2ray.key;
-        ssl_protocols         TLSv1.3;
+        ssl_protocols         TLSv1.2 TLSv1.3;
         ssl_ciphers           TLS13-AES-256-GCM-SHA384:TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-128-GCM-SHA256:TLS13-AES-128-CCM-8-SHA256:TLS13-AES-128-CCM-SHA256:EECDH+CHACHA20:EECDH+CHACHA20-draft:EECDH+ECDSA+AES128:EECDH+aRSA+AES128:RSA+AES128:EECDH+ECDSA+AES256:EECDH+aRSA+AES256:RSA+AES256:EECDH+ECDSA+3DES:EECDH+aRSA+3DES:RSA+3DES:!MD5;
         add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
         add_header X-Frame-Options  DENY ;
-	    add_header X-Content-Type-Options  nosniff ;
-	    add_header X-Xss-Protection 1;  
+        add_header X-Content-Type-Options  nosniff ;
+        add_header X-Xss-Protection 1;  
         server_name           serveraddr.com;
         index index.html index.htm;
-        root  /home/wwwroot/250;
+        root  /home/wwwroot/2444989513.github.io;
         error_page 400 = /400.html;
         location /ray/ 
         {
@@ -464,7 +464,7 @@ EOF
     vmess_link="vmess://$(cat /etc/v2ray/vmess_qr.json | base64 -w 0)"
     echo -e "${Red} URL导入链接:${vmess_link} ${Font}" >>./v2ray_info.txt
     echo -e "${Red} 二维码: ${Font}" >>./v2ray_info.txt
-    echo "${vmess_link}"| qrencode -o - -t utf8 >>./v2ray_info.txt
+    echo -n "${vmess_link}"| qrencode -o - -t utf8 >>./v2ray_info.txt
 }
 
 show_information(){
