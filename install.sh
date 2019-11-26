@@ -378,6 +378,13 @@ server {
         add_header X-Frame-Options  DENY ;
         add_header X-Content-Type-Options  nosniff ;
         add_header X-Xss-Protection 1;  
+        resolver 1.1.1.1 8.8.8.8 valid=300s;
+	    resolver_timeout 10s;
+   	    ssl_prefer_server_ciphers on;
+        add_header X-Frame-Options DENY;
+        ssl_session_cache shared:SSL:10m;
+        ssl_session_timeout 10m;
+        
         server_name           serveraddr.com;
         index index.html index.htm;
         root  /home/wwwroot/2444989513.github.io;
