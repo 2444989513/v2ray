@@ -586,6 +586,5 @@ main(){
     start_process_systemd
     acme_cron_update
 }
-
-list $1
+main
 
