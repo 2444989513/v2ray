@@ -55,10 +55,7 @@ Vmess + HTTP2 over TLS
 ```
 bash <(curl -L -s https://raw.githubusercontent.com/2444989513/v2ray/master/install_h2.sh) | tee v2ray_ins_h2.log
 ```
-Vmess+websocket+TLS+Nginx+Website+hsts
-```
-bash <(curl -L -s https://raw.githubusercontent.com/2444989513/v2ray/master/250.sh) | tee v2ray_ins.log
-```
+
 
 
 ## 启动方式
