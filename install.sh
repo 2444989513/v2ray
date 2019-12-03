@@ -587,4 +587,4 @@ main(){
     acme_cron_update
 }
 
-
+main
