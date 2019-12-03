@@ -586,24 +586,6 @@ main(){
     start_process_systemd
     acme_cron_update
 }
-list(){
-    case $1 in
-        tls_modify)
-            tls_type
-            ;;
-        uninstall)
-            uninstall_all
-            ;;
-        crontab_modify)
-            acme_cron_update
-            ;;
-        boost)
-            bash <(curl -L -s "https://raw.githubusercontent.com/chiakge/Linux-NetSpeed/master/tcp.sh")
-            ;;
-        *)
-            main
-            ;;
-    esac
-}
+
 list $1
 
