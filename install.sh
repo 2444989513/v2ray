@@ -366,35 +366,25 @@ acme(){
 }
 v2ray_conf_add(){
     cd /etc/v2ray
-       wget https://raw.githubusercontent.com/2444989513/V2ray/master/tls/config.json -O config.json
+    wget https://raw.githubusercontent.com/2444989513/V2ray/master/tls/config.json -O config.json
 modify_port_UUID
 judge "V2ray 配置修改"
 }
 nginx_conf_add(){
     touch ${nginx_conf_dir}/v2ray.conf
     cat>${nginx_conf_dir}/v2ray.conf<<EOF
-server {
+    server {
         listen 443 ssl http2;
         ssl_certificate       /data/v2ray.crt;
         ssl_certificate_key   /data/v2ray.key;
         ssl_protocols         TLSv1.2 TLSv1.3;
         ssl_ciphers           TLS13-AES-256-GCM-SHA384:TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-128-GCM-SHA256:TLS13-AES-128-CCM-8-SHA256:TLS13-AES-128-CCM-SHA256:EECDH+CHACHA20:EECDH+CHACHA20-draft:EECDH+ECDSA+AES128:EECDH+aRSA+AES128:RSA+AES128:EECDH+ECDSA+AES256:EECDH+aRSA+AES256:RSA+AES256:EECDH+ECDSA+3DES:EECDH+aRSA+3DES:RSA+3DES:!MD5;
         add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
-        add_header X-Frame-Options  DENY ;
-        add_header X-Content-Type-Options  nosniff ;
-        add_header X-Xss-Protection 1;  
-        resolver 1.1.1.1 8.8.8.8 valid=300s;
-	    resolver_timeout 10s;
-   	    ssl_prefer_server_ciphers on;
-        add_header X-Frame-Options DENY;
-        ssl_session_cache shared:SSL:10m;
-        ssl_session_timeout 10m;
-        
         server_name           serveraddr.com;
         index index.html index.htm;
-        root  /home/wwwroot/2444989513.github.io;
+        root  /home/wwwroot/3DCEList;
         error_page 400 = /400.html;
-        location /ray/ 
+        location /ray/
         {
         proxy_redirect off;
         proxy_pass http://127.0.0.1:10000;
@@ -586,5 +576,5 @@ main(){
     start_process_systemd
     acme_cron_update
 }
-main
 
+main
