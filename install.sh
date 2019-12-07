@@ -382,7 +382,7 @@ nginx_conf_add(){
         add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
         server_name           serveraddr.com;
         index index.html index.htm;
-        root  /home/wwwroot/3DCEList;
+        root  /home/wwwroot/2444989513.github.io;
         error_page 400 = /400.html;
         location /ray/
         {
