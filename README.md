@@ -59,6 +59,11 @@ h2-tls
 ```
 wget -N --no-check-certificate -q -O h2-tls.sh "https://raw.githubusercontent.com/2444989513/v2ray/master/h2-tls.sh" && chmod +x h2-tls.sh && bash h2-tls.sh
 ```
+```
+bash h2-tls.sh
+```
+
+---
 
 Vmess+websocket+TLS+Nginx+Website
 ```
