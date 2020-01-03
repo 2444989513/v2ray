@@ -938,8 +938,8 @@ menu(){
           vmess_qr_link_image
           show_information
           ;;
-       # 11)
-       #   bbr_boost_sh
+        11)
+          bbr_boost_sh
           ;;
         12)
           stop_process_systemd
