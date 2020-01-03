@@ -47,10 +47,17 @@
 * [V2ray官方说明](https://www.v2ray.com/)，了解 TLS WebSocket 及 V2ray 相关信息
 * 安装好 curl
 ## 安装方式（不兼容，二选一）
-
+RHEL 7 / CentOS 7:
+```
+sudo yum install man man-pages man-db
+```
+RHEL 6 / CentOS 6:
+```
+sudo yum install man man-pages
+```
 h2-tls
 ```
-bash <(curl -L -s https://raw.githubusercontent.com/2444989513/v2ray/master/h2-tls.sh) | tee h2-tls.log
+wget -N --no-check-certificate -q -O h2-tls.sh "https://raw.githubusercontent.com/2444989513/v2ray/master/h2-tls.sh" && chmod +x h2-tls.sh && bash h2-tls.sh
 ```
 
 Vmess+websocket+TLS+Nginx+Website
