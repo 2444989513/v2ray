@@ -941,7 +941,7 @@ menu(){
     echo -e "${Green}9.${Font}  查看 实时错误日志"
     echo -e "${Green}10.${Font} 查看 V2Ray 配置信息"
     echo -e "—————————————— 其他选项 ——————————————"
-    echo -e "${Green}11.${Font} 安装 后果自负 自用-功能-只能 CentOS 6 7 原版bbr"
+    echo -e "${Green}11.${Font} 安装 后果自负 自用-功能-只能 CentOS 6 7 原版bbr 2.0"
     echo -e "${Green}12.${Font} 安装 后果自负 自用-功能-只能 CentOS 6 7 升级openssl版本到1.1.1d"
     echo -e "${Green}13.${Font} 安装 后果自负 自用-功能-只能 CentOS 6 7 升级openssh版本到8.1p1"
     echo -e "${Green}14.${Font} 证书 有效期更新"
