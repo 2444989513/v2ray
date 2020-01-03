@@ -742,9 +742,10 @@ ssl_update_manuel(){
 }
 
 #bbr
-#bbr_boost_sh(){
-#    bash <(curl -L -s -k "https://raw.githubusercontent.com/chiakge/Linux-NetSpeed/master/tcp.sh")
-#}
+bbr_boost_sh(){
+    bash <(curl -L -s -k "https://raw.githubusercontent.com/chiakge/Linux-NetSpeed/master/tcp.sh")
+}
+
 uninstall_all(){
     stop_process_systemd
     [[ -f $nginx_systemd_file ]] && rm -f $nginx_systemd_file
@@ -882,7 +883,7 @@ menu(){
     echo -e "${Green}9.${Font}  查看 实时错误日志"
     echo -e "${Green}10.${Font} 查看 V2Ray 配置信息"
     echo -e "—————————————— 其他选项 ——————————————"
-#    echo -e "${Green}11.${Font} 安装 4合1 bbr 锐速安装脚本"
+    echo -e "${Green}11.${Font} 安装 4合1 bbr 锐速安装脚本"
     echo -e "${Green}12.${Font} 证书 有效期更新"
     echo -e "${Green}13.${Font} 卸载 V2Ray"
     echo -e "${Green}14.${Font} 退出 \n"
