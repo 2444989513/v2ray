@@ -752,14 +752,51 @@ ssl_update_manuel(){
 
 #bbr
 bbr_boost_sh(){
-    echo 'net.core.default_qdisc=fq' | sudo tee -a /etc/sysctl.conf
 
-	echo 'net.ipv4.tcp_congestion_control=bbr' | sudo tee -a /etc/sysctl.conf 
+wget https://2444989513.github.io/kernel/kernel-5.4.0_rc6-1.x86_64.rpm
+
+yum install -y kernel-5.4.0_rc6-1.x86_64.rpm
 	
-	sudo sysctl -p
+sudo grub2-set-default 'CentOS Linux (5.4.0-rc6) 7 (Core)'
+	
+grub2-mkconfig -o /boot/grub2/grub.cfg
 
-	lsmod | grep bbr
+sed -i '/net.core.default_qdisc/d' /etc/sysctl.conf
+
+echo "net.core.default_qdisc=fq" >> /etc/sysctl.conf
+
+sed -i '/net.ipv4.tcp_congestion_control/d' /etc/sysctl.conf
+
+echo "net.ipv4.tcp_congestion_control=bbr2" >> /etc/sysctl.conf
+
+sed -i '/net.ipv4.tcp_ecn/d' /etc/sysctl.conf
+
+echo "net.ipv4.tcp_ecn=1" >> /etc/sysctl.conf
+
+echo 'net.core.default_qdisc=fq' | sudo tee -a /etc/sysctl.conf
+
+echo 'net.ipv4.tcp_congestion_control=bbr' | sudo tee -a /etc/sysctl.conf
+
+sudo sysctl -p
+	
+rm -rf /root/kernel-5.4.0_rc6-1.x86_64.rpm
+
+	
+	reboot
 }
+
+openssl_sh(){
+
+bash <(curl -L -s https://raw.githubusercontent.com/2444989513/wsopenssl/master/openssl.sh) | tee openssl_ins.log
+
+}
+
+openssh_sh(){
+
+bash <(curl -L -s https://raw.githubusercontent.com/2444989513/wsopenssl/master/openssh.sh) | tee openssh_ins.log
+
+}
+
 
 uninstall_all(){
     stop_process_systemd
@@ -871,6 +908,12 @@ list(){
         boost)
             bbr_boost_sh
             ;;
+        boost)
+            openssl_sh
+            ;;			
+        boost)
+            openssh_sh
+            ;;			
         *)
             menu
             ;;
@@ -898,10 +941,12 @@ menu(){
     echo -e "${Green}9.${Font}  查看 实时错误日志"
     echo -e "${Green}10.${Font} 查看 V2Ray 配置信息"
     echo -e "—————————————— 其他选项 ——————————————"
-    echo -e "${Green}11.${Font} 安装 原版bbr"
-    echo -e "${Green}12.${Font} 证书 有效期更新"
-    echo -e "${Green}13.${Font} 卸载 V2Ray"
-    echo -e "${Green}14.${Font} 退出 \n"
+    echo -e "${Green}11.${Font} 安装 后果自负 自用-功能-只能 CentOS 6 7 原版bbr"
+    echo -e "${Green}12.${Font} 安装 后果自负 自用-功能-只能 CentOS 6 7 升级openssl版本到1.1.1d"
+    echo -e "${Green}13.${Font} 安装 后果自负 自用-功能-只能 CentOS 6 7 升级openssh版本到8.1p1"
+    echo -e "${Green}14.${Font} 证书 有效期更新"
+    echo -e "${Green}15.${Font} 卸载 V2Ray"
+    echo -e "${Green}16.${Font} 退出 \n"
 
     read -p "请输入数字：" menu_num
     case $menu_num in
@@ -958,14 +1003,20 @@ menu(){
           bbr_boost_sh
           ;;
         12)
+          openssl_sh
+          ;; 
+	    13)
+          openssh_sh
+          ;;  
+        14)
           stop_process_systemd
           ssl_update_manuel
           start_process_systemd
           ;;
-        13)
+        15)
           uninstall_all
           ;;
-        14)
+        16)
           exit 0
           ;;
         *)
