@@ -752,7 +752,13 @@ ssl_update_manuel(){
 
 #bbr
 bbr_boost_sh(){
-    bash <(curl -L -s -k "https://raw.githubusercontent.com/chiakge/Linux-NetSpeed/master/tcp.sh")
+    echo 'net.core.default_qdisc=fq' | sudo tee -a /etc/sysctl.conf
+
+	echo 'net.ipv4.tcp_congestion_control=bbr' | sudo tee -a /etc/sysctl.conf 
+	
+	sudo sysctl -p
+
+	lsmod | grep bbr
 }
 
 uninstall_all(){
@@ -892,7 +898,7 @@ menu(){
     echo -e "${Green}9.${Font}  查看 实时错误日志"
     echo -e "${Green}10.${Font} 查看 V2Ray 配置信息"
     echo -e "—————————————— 其他选项 ——————————————"
-    echo -e "${Green}11.${Font} 安装 4合1 bbr 锐速安装脚本"
+    echo -e "${Green}11.${Font} 安装 原版bbr"
     echo -e "${Green}12.${Font} 证书 有效期更新"
     echo -e "${Green}13.${Font} 卸载 V2Ray"
     echo -e "${Green}14.${Font} 退出 \n"
