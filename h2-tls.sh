@@ -1,5 +1,6 @@
 #!/bin/bash
 
+cd $(cd "$(dirname "$0")"; pwd)
 #====================================================
 #	System Request:Debian 9+/Ubuntu 18.04+/Centos 7+
 #	Author:	wulabing
@@ -23,7 +24,7 @@ OK="${Green}[OK]${Font}"
 Error="${Red}[错误]${Font}"
 
 # 版本
-shell_version="1.0"
+shell_version="1.0.5"
 shell_mode="None"
 version_cmp="/tmp/version_cmp.tmp"
 v2ray_conf_dir="/etc/v2ray"
@@ -41,7 +42,7 @@ v2ray_systemd_file="/etc/systemd/system/v2ray.service"
 v2ray_access_log="/var/log/v2ray/access.log"
 v2ray_error_log="/var/log/v2ray/error.log"
 amce_sh_file="/root/.acme.sh/acme.sh"
-nginx_version="1.17.7"
+nginx_version="1.16.1"
 openssl_version="1.1.1d"
 
 #生成伪装路径
@@ -73,6 +74,9 @@ check_system(){
     $INS install dbus
     systemctl stop firewalld && systemctl disable firewalld
     echo -e "${OK} ${GreenBG} firewalld 已关闭 ${Font}"
+
+    systemctl stop ufw && systemctl disable ufw
+    echo -e "${OK} ${GreenBG} ufw 已关闭 ${Font}"
 }
 
 is_root(){
@@ -150,14 +154,7 @@ dependency_install(){
     judge "crontab 自启动配置 "
 
 
-    if [[ "${ID}" == "centos" ]];then
-       ${INS} -y update
-    else
-       ${INS}-get update -y
-    fi
-	    judge "更新系统"
-	
-	
+
     ${INS} -y install bc
     judge "安装 bc"
 
@@ -166,55 +163,25 @@ dependency_install(){
 
     ${INS} -y install qrencode
     judge "安装 qrencode"
-	
+
+    ${INS} -y install curl
+    judge "安装 crul"
 
     if [[ "${ID}" == "centos" ]];then
        ${INS} -y groupinstall "Development tools"
     else
        ${INS} -y install build-essential
     fi
-        judge "编译工具包 安装 1"
-	
-	
-		    if [[ "${ID}" == "centos" ]];then
-       ${INS} install -y gperftools-devel libatomic_ops-devel pcre-devel zlib-devel libxslt-devel gd-devel perl-ExtUtils-Embed geoip-devel lksctp-tools-devel libxml2-devel gcc gcc-c++ wget unzip curl
-    else
-       ${INS} install -y libgoogle-perftools-dev libatomic-ops-dev libperl-dev libxslt-dev zlib1g-dev libpcre3-dev libgeoip-dev libgd-dev libxml2-dev libsctp-dev miredo g++ wget gcc unzip curl
-    fi
-	    judge "编译工具包 安装 2"
-		
-		
-	
-    if [[ "${ID}" == "centos" ]];then
-       ${INS} clean all
-    else
-       ${INS} clean
-    fi
-	    judge "编译工具包 安装 3"
-	
-	
-	
-
-    if [[ "${ID}" == "centos" ]];then
-       ${INS} -y install pcre pcre-devel zlib-devel
-    else
-       ${INS} -y install libpcre3 libpcre3-dev zlib1g-dev dbus
-    fi
-        judge "nginx 编译依赖安装 4"
-	
-	
+    judge "编译工具包 安装"
 
     if [[ "${ID}" == "centos" ]];then
        ${INS} -y install pcre pcre-devel zlib-devel epel-release
     else
        ${INS} -y install libpcre3 libpcre3-dev zlib1g-dev dbus
     fi
-        judge "nginx 编译依赖安装 5"
-	
-	
-    ${INS} -y install rng-tools
-#    judge "rng-tools 安装"
 
+#    ${INS} -y install rng-tools
+#    judge "rng-tools 安装"
 
     ${INS} -y install haveged
 #    judge "haveged 安装"
@@ -222,12 +189,12 @@ dependency_install(){
     sed -i -r '/^HRNGDEVICE/d;/#HRNGDEVICE=\/dev\/null/a HRNGDEVICE=/dev/urandom' /etc/default/rng-tools
 
     if [[ "${ID}" == "centos" ]];then
-       systemctl start rngd && systemctl enable rngd
+#       systemctl start rngd && systemctl enable rngd
 #       judge "rng-tools 启动"
        systemctl start haveged && systemctl enable haveged
 #       judge "haveged 启动"
     else
-       systemctl start rng-tools && systemctl enable rng-tools
+#       systemctl start rng-tools && systemctl enable rng-tools
 #       judge "rng-tools 启动"
        systemctl start haveged && systemctl enable haveged
 #       judge "haveged 启动"
@@ -296,7 +263,7 @@ modify_nginx_other(){
 web_camouflage(){
     ##请注意 这里和LNMP脚本的默认路径冲突，千万不要在安装了LNMP的环境下使用本脚本，否则后果自负
     rm -rf /home/wwwroot && mkdir -p /home/wwwroot && cd /home/wwwroot
-    git clone https://github.com/2444989513/2444989513.github.io.git
+    git clone https://github.com/wulabing/3DCEList.git
     judge "web 站点伪装"
 }
 v2ray_install(){
@@ -334,7 +301,6 @@ nginx_install(){
 #        rm -rf /etc/nginx
 #    fi
 
-
     wget -nc http://nginx.org/download/nginx-${nginx_version}.tar.gz -P ${nginx_openssl_src}
     judge "Nginx 下载"
     wget -nc https://www.openssl.org/source/openssl-${openssl_version}.tar.gz -P ${nginx_openssl_src}
@@ -354,56 +320,17 @@ nginx_install(){
     sleep 4
 
     cd nginx-${nginx_version}
-./configure --prefix="${nginx_dir}"                      \
---with-openssl=../openssl-"$openssl_version"             \
---with-openssl-opt="enable-tls1_3 enable-tls1_2 enable-tls1 enable-ssl enable-ssl2 enable-ssl3 enable-ec_nistp_64_gcc_128 shared threads zlib-dynamic sctp"      \
---with-mail=dynamic                                      \
---with-mail_ssl_module                                   \
---with-stream=dynamic                                    \
---with-stream_ssl_module                                 \
---with-stream_realip_module                              \
---with-stream_geoip_module=dynamic                       \
---with-stream_ssl_preread_module                         \
---with-http_gzip_static_module                           \
---with-http_realip_module                                \
---with-http_ssl_module                                   \
---with-http_v2_module                                    \
---with-http_realip_module                                \
---with-http_addition_module                              \
---with-http_xslt_module=dynamic                          \
---with-http_image_filter_module=dynamic                  \
---with-http_geoip_module=dynamic                         \
---with-http_sub_module                                   \
---with-http_dav_module                                   \
---with-http_flv_module                                   \
---with-http_mp4_module                                   \
---with-http_gunzip_module                                \
---with-http_gzip_static_module                           \
---with-http_auth_request_module                          \
---with-http_random_index_module                          \
---with-http_secure_link_module                           \
---with-http_degradation_module                           \
---with-http_slice_module                                 \
---with-http_stub_status_module                           \
---with-http_perl_module=dynamic                          \
---with-pcre                                              \
---with-libatomic                                         \
---with-compat                                            \
---with-cpp_test_module                                   \
---with-google_perftools_module                           \
---with-file-aio                                          \
---with-threads                                           \
---with-poll_module                                       \
---with-select_module                                     \
---with-cc='cc -O3'                                       \
---with-cc-opt=-O3  
-
-
-
-    sed -i 's# -g # #' objs/Makefile                                                  ##关闭调试
-    sed -i 's#CFLAGS="\$CFLAGS -g"#CFLAGS="\$CFLAGS"#' auto/cc/*                      ##关闭调试
-    sed -i 's#CFLAGS="\$CFLAGS -g #CFLAGS="\$CFLAGS #' auto/cc/*                      ##关闭调试
-
+    ./configure --prefix="${nginx_dir}"                         \
+            --with-http_ssl_module                              \
+            --with-http_gzip_static_module                      \
+            --with-http_stub_status_module                      \
+            --with-pcre                                         \
+            --with-http_realip_module                           \
+            --with-http_flv_module                              \
+            --with-http_mp4_module                              \
+            --with-http_secure_link_module                      \
+            --with-http_v2_module                               \
+            --with-openssl=../openssl-"$openssl_version"
     judge "编译检查"
     make && make install
     judge "Nginx 编译安装"
@@ -413,7 +340,7 @@ nginx_install(){
     sed -i 's/worker_processes  1;/worker_processes  3;/' ${nginx_dir}/conf/nginx.conf
     sed -i 's/    worker_connections  1024;/    worker_connections  4096;/' ${nginx_dir}/conf/nginx.conf
     sed -i '$i include conf.d/*.conf;' ${nginx_dir}/conf/nginx.conf
-    sed -i '$i server_tokens off;' ${nginx_dir}/conf/nginx.conf
+
 
 
     # 删除临时文件
@@ -484,6 +411,8 @@ acme(){
         sleep 2
     else
         echo -e "${Error} ${RedBG} SSL 证书测试签发失败 ${Font}"
+        rm -rf "~/.acme.sh/${domain}_ecc/${domain}.key" && rm -rf "~/.acme.sh/${domain}_ecc/${domain}.cer"
+        exit 1
     fi
 
     ~/.acme.sh/acme.sh --issue -d ${domain} --standalone -k ec-256 --force
@@ -498,12 +427,13 @@ acme(){
         fi
     else
         echo -e "${Error} ${RedBG} SSL 证书生成失败 ${Font}"
+        rm -rf "~/.acme.sh/${domain}_ecc/${domain}.key" && rm -rf "~/.acme.sh/${domain}_ecc/${domain}.cer"
         exit 1
     fi
 }
 v2ray_conf_add_tls(){
     cd /etc/v2ray
-    wget https://raw.githubusercontent.com/2444989513/V2ray/master/tls/config.json -O config.json
+    wget https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/master/tls/config.json -O config.json
     modify_path
     modify_alterid
     modify_inbound_port
@@ -511,7 +441,7 @@ v2ray_conf_add_tls(){
 }
 v2ray_conf_add_h2(){
     cd /etc/v2ray
-    wget https://raw.githubusercontent.com/2444989513/V2ray/master/http2/config.json -O config.json
+    wget https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/master/http2/config.json -O config.json
     modify_path
     modify_alterid
     modify_inbound_port
@@ -521,21 +451,12 @@ nginx_conf_add(){
     touch ${nginx_conf_dir}/v2ray.conf
     cat>${nginx_conf_dir}/v2ray.conf<<EOF
     server {
-        listen 443 ssl http2 spdy;
-        listen [::]:443 ssl http2 spdy;
+        listen 443 ssl http2;
         ssl_certificate       /data/v2ray.crt;
         ssl_certificate_key   /data/v2ray.key;
-        ssl_protocols         TLSv1.3 TLSv1.2;
+        ssl_protocols         TLSv1.2 TLSv1.3;
         ssl_ciphers           TLS13-AES-256-GCM-SHA384:TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-128-GCM-SHA256:TLS13-AES-128-CCM-8-SHA256:TLS13-AES-128-CCM-SHA256:EECDH+CHACHA20:EECDH+CHACHA20-draft:EECDH+ECDSA+AES128:EECDH+aRSA+AES128:RSA+AES128:EECDH+ECDSA+AES256:EECDH+aRSA+AES256:RSA+AES256:EECDH+ECDSA+3DES:EECDH+aRSA+3DES:RSA+3DES:!MD5;
         server_name           serveraddr.com;
-		add_header X-Frame-Options "SAMEORIGIN" always;
-        add_header X-Content-Type-Options "nosniff" always;
-        add_header X-Xss-Protection "1; mode=block" always;
-	    resolver_timeout 10s;
-   	    ssl_prefer_server_ciphers on;
-        ssl_session_cache shared:SSL:50m;
-        ssl_session_timeout 1d;
-		server_tokens off;
         index index.html index.htm;
         root  /home/wwwroot/3DCEList;
         error_page 400 = /400.html;
@@ -551,9 +472,7 @@ nginx_conf_add(){
 }
     server {
         listen 80;
-        listen [::]:80;
         server_name serveraddr.com;
-		server_tokens off;
         return 301 https://use.shadowsocksr.win\$request_uri;
     }
 EOF
@@ -611,11 +530,11 @@ nginx_process_disabled(){
 #}
 acme_cron_update(){
     if [[ "${ID}" == "centos" ]];then
-        sed -i "/acme.sh/c 0 3 * * 0 systemctl stop nginx && \"/root/.acme.sh\"/acme.sh --cron --home \"/root/.acme.sh\" \
-        > /dev/null && systemctl start nginx" /var/spool/cron/root
+        sed -i "/acme.sh/c 0 3 * * 0 \"/root/.acme.sh\"/acme.sh --cron --home \"/root/.acme.sh\" \
+        &> /dev/null" /var/spool/cron/root
     else
-        sed -i "/acme.sh/c 0 3 * * 0 systemctl stop nginx && \"/root/.acme.sh\"/acme.sh --cron --home \"/root/.acme.sh\" \
-        > /dev/null && systemctl start nginx" /var/spool/cron/crontabs/root
+        sed -i "/acme.sh/c 0 3 * * 0 \"/root/.acme.sh\"/acme.sh --cron --home \"/root/.acme.sh\" \
+        &> /dev/null" /var/spool/cron/crontabs/root
     fi
     judge "cron 计划任务更新"
 }
@@ -682,9 +601,9 @@ show_information(){
     cat ${v2ray_info_file}
 }
 ssl_judge_and_install(){
-    if [[ -f "/data/v2ray.key" && -f "/data/v2ray.crt" ]];then
-        echo "证书文件已存在"
-    elif [[ -f "~/.acme.sh/${domain}_ecc/${domain}.key" && -f "~/.acme.sh/${domain}_ecc/${domain}.cer" ]];then
+#    if [[ -f "/data/v2ray.key" && -f "/data/v2ray.crt" ]];then
+#        echo "证书文件已存在"
+    if [[ -f "~/.acme.sh/${domain}_ecc/${domain}.key" && -f "~/.acme.sh/${domain}_ecc/${domain}.cer" ]];then
         echo "证书文件已存在"
         ~/.acme.sh/acme.sh --installcert -d ${domain} --fullchainpath /data/v2ray.crt --keypath /data/v2ray.key --ecc
         judge "证书应用"
@@ -749,54 +668,12 @@ show_error_log(){
 ssl_update_manuel(){
     [ -f ${amce_sh_file} ] && "/root/.acme.sh"/acme.sh --cron --home "/root/.acme.sh" || echo -e  "${RedBG}证书签发工具不存在，请确认你是否使用了自己的证书${Font}"
 }
-
-#bbr
 bbr_boost_sh(){
-
-wget https://2444989513.github.io/kernel/kernel-5.4.0_rc6-1.x86_64.rpm
-
-yum install -y kernel-5.4.0_rc6-1.x86_64.rpm
-	
-sudo grub2-set-default 'CentOS Linux (5.4.0-rc6) 7 (Core)'
-	
-grub2-mkconfig -o /boot/grub2/grub.cfg
-
-sed -i '/net.core.default_qdisc/d' /etc/sysctl.conf
-
-echo "net.core.default_qdisc=fq" >> /etc/sysctl.conf
-
-sed -i '/net.ipv4.tcp_congestion_control/d' /etc/sysctl.conf
-
-echo "net.ipv4.tcp_congestion_control=bbr2" >> /etc/sysctl.conf
-
-sed -i '/net.ipv4.tcp_ecn/d' /etc/sysctl.conf
-
-echo "net.ipv4.tcp_ecn=1" >> /etc/sysctl.conf
-
-echo 'net.core.default_qdisc=fq' | sudo tee -a /etc/sysctl.conf
-
-echo 'net.ipv4.tcp_congestion_control=bbr' | sudo tee -a /etc/sysctl.conf
-
-sudo sysctl -p
-	
-rm -rf /root/kernel-5.4.0_rc6-1.x86_64.rpm
-
-	
-	reboot
+    wget -N --no-check-certificate https://raw.githubusercontent.com/wulabing/Linux-NetSpeed/master/tcp.sh && chmod +x tcp.sh && bash tcp.sh
 }
-
-openssl_sh(){
-
-bash <(curl -L -s https://raw.githubusercontent.com/2444989513/wsopenssl/master/openssl.sh) | tee openssl_ins.log
-
+mtproxy_sh(){
+    wget -N --no-check-certificate https://github.com/whunt1/onekeymakemtg/raw/master/mtproxy_go.sh && chmod +x mtproxy_go.sh && bash mtproxy_go.sh
 }
-
-openssh_sh(){
-
-bash <(curl -L -s https://raw.githubusercontent.com/2444989513/wsopenssl/master/openssh.sh) | tee openssh_ins.log
-
-}
-
 
 uninstall_all(){
     stop_process_systemd
@@ -868,7 +745,7 @@ install_v2_h2(){
 
 }
 update_sh(){
-    ol_version=$(curl -L -s https://raw.githubusercontent.com/2444989513/v2ray/master/install.sh | grep "shell_version=" | head -1 |awk -F '=|"' '{print $3}')
+    ol_version=$(curl -L -s https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/master/install.sh | grep "shell_version=" | head -1 |awk -F '=|"' '{print $3}')
     echo "$ol_version" > $version_cmp
     echo "$shell_version" >> $version_cmp
     if [[ "$shell_version" < "$(sort -rV $version_cmp | head -1)" ]]
@@ -877,7 +754,7 @@ update_sh(){
         read -r update_confirm
         case $update_confirm in
             [yY][eE][sS]|[yY])
-                wget -N --no-check-certificate https://raw.githubusercontent.com/2444989513/v2ray/master/install.sh
+                wget -N --no-check-certificate https://raw.githubusercontent.com/wulabing/V2Ray_ws-tls_bash_onekey/master/install.sh
                 echo -e "${OK} ${Green} 更新完成 ${Font}"
                 ;;
             *)
@@ -908,12 +785,6 @@ list(){
         boost)
             bbr_boost_sh
             ;;
-        boost)
-            openssl_sh
-            ;;			
-        boost)
-            openssh_sh
-            ;;			
         *)
             menu
             ;;
@@ -941,13 +812,14 @@ menu(){
     echo -e "${Green}9.${Font}  查看 实时错误日志"
     echo -e "${Green}10.${Font} 查看 V2Ray 配置信息"
     echo -e "—————————————— 其他选项 ——————————————"
-    echo -e "${Green}11.${Font} 安装 后果自负 自用-功能-只能 CentOS 6 7 原版bbr2.0"
-    echo -e "${Green}12.${Font} 安装 后果自负 自用-功能-只能 CentOS 6 7 升级openssl版本到1.1.1d"
-    echo -e "${Green}13.${Font} 安装 后果自负 自用-功能-只能 CentOS 6 7 升级openssh版本到8.1p1"
-    echo -e "${Green}14.${Font} 证书 有效期更新"
-    echo -e "${Green}15.${Font} 卸载 V2Ray"
+    echo -e "${Green}11.${Font} 安装 4合1 bbr 锐速安装脚本"
+    echo -e "${Green}12.${Font} 安装 MTproxy(支持TLS混淆)"
+    echo -e "${Green}13.${Font} 证书 有效期更新"
+    echo -e "${Green}14.${Font} 卸载 V2Ray"
+    echo -e "${Green}15.${Font} 更新 证书crontab计划任务"
     echo -e "${Green}16.${Font} 退出 \n"
 
+    update_sh
     read -p "请输入数字：" menu_num
     case $menu_num in
         0)
@@ -1003,18 +875,18 @@ menu(){
           bbr_boost_sh
           ;;
         12)
-          openssl_sh
-          ;; 
-	    13)
-          openssh_sh
-          ;;  
-        14)
+          mtproxy_sh
+          ;;
+        13)
           stop_process_systemd
           ssl_update_manuel
           start_process_systemd
           ;;
-        15)
+        14)
           uninstall_all
+          ;;
+        15)
+          acme_cron_update
           ;;
         16)
           exit 0
@@ -1027,3 +899,4 @@ menu(){
 
 judge_mode
 list $1
+
