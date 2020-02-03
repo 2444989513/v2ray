@@ -32,7 +32,7 @@ nginx_openssl_src="/usr/local/src"
 v2ray_bin_file="/usr/bin/v2ray"
 nginx_systemd_file="/lib/systemd/system/nginx.service"
 v2ray_systemd_file="/etc/systemd/system/v2ray.service"
-nginx_version="1.16.1"
+nginx_version="1.17.8"
 openssl_version="1.1.1d"
 
 #生成伪装路径
@@ -64,6 +64,9 @@ check_system(){
     $INS install dbus
     systemctl stop firewalld && systemctl disable firewalld
     echo -e "${OK} ${GreenBG} firewalld 已关闭 ${Font}"
+
+    systemctl stop ufw && systemctl disable ufw
+    echo -e "${OK} ${GreenBG} ufw 已关闭 ${Font}"
 }
 
 is_root(){
@@ -159,14 +162,30 @@ dependency_install(){
     judge "编译工具包 安装"
 
     if [[ "${ID}" == "centos" ]];then
-       ${INS} -y install pcre pcre-devel zlib-devel
+       ${INS} -y install pcre pcre-devel zlib-devel epel-release
     else
        ${INS} -y install libpcre3 libpcre3-dev zlib1g-dev dbus
     fi
 
+    ${INS} -y install rng-tools
+#    judge "rng-tools 安装"
 
-    judge "nginx 编译依赖安装"
+    ${INS} -y install haveged
+#    judge "haveged 安装"
 
+    sed -i -r '/^HRNGDEVICE/d;/#HRNGDEVICE=\/dev\/null/a HRNGDEVICE=/dev/urandom' /etc/default/rng-tools
+
+    if [[ "${ID}" == "centos" ]];then
+       systemctl start rngd && systemctl enable rngd
+#       judge "rng-tools 启动"
+       systemctl start haveged && systemctl enable haveged
+#       judge "haveged 启动"
+    else
+       systemctl start rng-tools && systemctl enable rng-tools
+#       judge "rng-tools 启动"
+       systemctl start haveged && systemctl enable haveged
+#       judge "haveged 启动"
+    fi
 }
 basic_optimization(){
     # 最大文件打开数
@@ -207,8 +226,18 @@ modify_nginx(){
 web_camouflage(){
     ##请注意 这里和LNMP脚本的默认路径冲突，千万不要在安装了LNMP的环境下使用本脚本，否则后果自负
     rm -rf /home/wwwroot && mkdir -p /home/wwwroot && cd /home/wwwroot
-    git clone https://github.com/2444989513/2444989513.github.io.git
+    git clone https://github.com/2444989513/250.git
     judge "web 站点伪装"
+}
+v2ray_all(){
+#    [[ -f $nginx_systemd_file ]] && rm -f $nginx_systemd_file
+#    [[ -d $nginx_dir ]] && rm -rf $nginx_dir
+#    [[ -d $web_dir ]] && rm -rf $web_dir
+
+    [[ -f $v2ray_systemd_file ]] && rm -f $v2ray_systemd_file
+    [[ -d $v2ray_bin_file ]] && rm -rf $v2ray_bin_file
+    [[ -d $v2ray_conf_dir ]] && rm -rf $v2ray_conf_dir
+    echo -e "v2ray"
 }
 v2ray_install(){
     if [[ -d /root/v2ray ]];then
@@ -218,7 +247,7 @@ v2ray_install(){
         rm -rf /etc/v2ray
     fi
     mkdir -p /root/v2ray && cd /root/v2ray
-    wget  --no-check-certificate https://install.direct/go.sh
+    wget -N --no-check-certificate https://install.direct/go.sh
 
     ## wget http://install.direct/go.sh
 
@@ -284,7 +313,7 @@ nginx_install(){
     sed -i 's/worker_processes  1;/worker_processes  3;/' ${nginx_dir}/conf/nginx.conf
     sed -i 's/    worker_connections  1024;/    worker_connections  4096;/' ${nginx_dir}/conf/nginx.conf
     sed -i '$i include conf.d/*.conf;' ${nginx_dir}/conf/nginx.conf
-
+    sed -i '$i server_tokens off;' ${nginx_dir}/conf/nginx.conf
 
 
     # 删除临时文件
@@ -349,6 +378,16 @@ port_exist_check(){
     fi
 }
 acme(){
+    ~/.acme.sh/acme.sh --issue -d ${domain} --standalone -k ec-256 --force --test
+    if [[ $? -eq 0 ]];then
+        echo -e "${OK} ${GreenBG} SSL 证书测试签发成功，开始正式签发 ${Font}"
+        sleep 2
+    else
+        echo -e "${Error} ${RedBG} SSL 证书测试签发失败 ${Font}"
+        rm -rf "~/.acme.sh/${domain}_ecc/${domain}.key" && rm -rf "~/.acme.sh/${domain}_ecc/${domain}.cer"
+        exit 1
+    fi
+
     ~/.acme.sh/acme.sh --issue -d ${domain} --standalone -k ec-256 --force
     if [[ $? -eq 0 ]];then
         echo -e "${OK} ${GreenBG} SSL 证书生成成功 ${Font}"
@@ -361,12 +400,13 @@ acme(){
         fi
     else
         echo -e "${Error} ${RedBG} SSL 证书生成失败 ${Font}"
+        rm -rf "~/.acme.sh/${domain}_ecc/${domain}.key" && rm -rf "~/.acme.sh/${domain}_ecc/${domain}.cer"
         exit 1
     fi
 }
 v2ray_conf_add(){
     cd /etc/v2ray
-    wget https://raw.githubusercontent.com/2444989513/V2ray/master/tls/config.json -O config.json
+    wget https://raw.githubusercontent.com/2444989513/test/master/tls/config.json -O config.json
 modify_port_UUID
 judge "V2ray 配置修改"
 }
@@ -379,11 +419,12 @@ nginx_conf_add(){
         ssl_certificate_key   /data/v2ray.key;
         ssl_protocols         TLSv1.2 TLSv1.3;
         ssl_ciphers           TLS13-AES-256-GCM-SHA384:TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-128-GCM-SHA256:TLS13-AES-128-CCM-8-SHA256:TLS13-AES-128-CCM-SHA256:EECDH+CHACHA20:EECDH+CHACHA20-draft:EECDH+ECDSA+AES128:EECDH+aRSA+AES128:RSA+AES128:EECDH+ECDSA+AES256:EECDH+aRSA+AES256:RSA+AES256:EECDH+ECDSA+3DES:EECDH+aRSA+3DES:RSA+3DES:!MD5;
-        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
         server_name           serveraddr.com;
+		add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
         index index.html index.htm;
-        root  /home/wwwroot/2444989513.github.io;
+        root  /home/wwwroot/250;
         error_page 400 = /400.html;
+		server_tokens off;
         location /ray/
         {
         proxy_redirect off;
@@ -396,7 +437,9 @@ nginx_conf_add(){
 }
     server {
         listen 80;
+		server_tokens off;
         server_name serveraddr.com;
+		add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
         return 301 https://use.shadowsocksr.win\$request_uri;
     }
 EOF
@@ -489,9 +532,9 @@ show_information(){
 
 }
 ssl_judge_and_install(){
-    if [[ -f "/data/v2ray.key" && -f "/data/v2ray.crt" ]];then
-        echo "证书文件已存在"
-    elif [[ -f "~/.acme.sh/${domain}_ecc/${domain}.key" && -f "~/.acme.sh/${domain}_ecc/${domain}.cer" ]];then
+#    if [[ -f "/data/v2ray.key" && -f "/data/v2ray.crt" ]];then
+#        echo "证书文件已存在"
+    if [[ -f "~/.acme.sh/${domain}_ecc/${domain}.key" && -f "~/.acme.sh/${domain}_ecc/${domain}.cer" ]];then
         echo "证书文件已存在"
         ~/.acme.sh/acme.sh --installcert -d ${domain} --fullchainpath /data/v2ray.crt --keypath /data/v2ray.key --ecc
         judge "证书应用"
@@ -506,6 +549,7 @@ nginx_systemd(){
 [Unit]
 Description=The NGINX HTTP and reverse proxy server
 After=syslog.target network.target remote-fs.target nss-lookup.target
+
 [Service]
 Type=forking
 PIDFile=/etc/nginx/logs/nginx.pid
@@ -514,6 +558,7 @@ ExecStart=/etc/nginx/sbin/nginx -c ${nginx_dir}/conf/nginx.conf
 ExecReload=/etc/nginx/sbin/nginx -s reload
 ExecStop=/bin/kill -s QUIT \$MAINPID
 PrivateTmp=true
+
 [Install]
 WantedBy=multi-user.target
 EOF
@@ -562,6 +607,7 @@ main(){
     basic_optimization
     domain_check
     port_alterid_set
+	v2ray_all
     v2ray_install
     port_exist_check 80
     port_exist_check ${port}
