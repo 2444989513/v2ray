@@ -534,7 +534,7 @@ show_information(){
 ssl_judge_and_install(){
     if [[ -f "/data/v2ray.key" && -f "/data/v2ray.crt" ]];then
         echo "证书文件已存在"
-    if [[ -f "~/.acme.sh/${domain}_ecc/${domain}.key" && -f "~/.acme.sh/${domain}_ecc/${domain}.cer" ]];then
+    elif [[ -f "~/.acme.sh/${domain}_ecc/${domain}.key" && -f "~/.acme.sh/${domain}_ecc/${domain}.cer" ]];then
         echo "证书文件已存在"
         ~/.acme.sh/acme.sh --installcert -d ${domain} --fullchainpath /data/v2ray.crt --keypath /data/v2ray.key --ecc
         judge "证书应用"
