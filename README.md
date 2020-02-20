@@ -47,11 +47,12 @@
 * [V2ray官方说明](https://www.v2ray.com/)，了解 TLS WebSocket 及 V2ray 相关信息
 * 安装好 curl
 ## 安装方式（不兼容，二选一)
-＃ 建议安装 Vmess+websocket+TLS+Nginx+Website
+个人建议安装
 Vmess+websocket+TLS+Nginx+Website
 ```
 bash <(curl -L -s https://raw.githubusercontent.com/2444989513/v2ray/master/install.sh) | tee v2ray_ins.log
 ```
+个人不太建议安装   但是你喜欢就好！！！！！
 Vmess + HTTP2 over TLS
 ```
 bash <(curl -L -s https://raw.githubusercontent.com/2444989513/v2ray/master/install_h2.sh) | tee v2ray_ins_h2.log
