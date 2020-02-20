@@ -36,9 +36,12 @@ bash <(curl -L -s https://raw.githubusercontent.com/2444989513/v2ray/master/inst
 ```
 
 # 查看客户端配置
-cat ~/v2ray_info.txt
+
+`cat ~/v2ray_info.txt`
+
 
 # 启动方式
+
 启动 V2ray：`systemctl start v2ray`
 
 停止 V2ray：`systemctl stop v2ray`
@@ -48,7 +51,8 @@ cat ~/v2ray_info.txt
 停止 Nginx：`systemctl stop nginx`
 
 # 相关目录
-Web 目录：`/home/wwwroot/3DCEList`
+
+Web 目录：`/home/wwwroot/250`
 
 V2ray 服务端配置：`/etc/v2ray/config.json`
 
