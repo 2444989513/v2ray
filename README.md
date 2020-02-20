@@ -35,7 +35,7 @@ bash <(curl -L -s https://raw.githubusercontent.com/2444989513/v2ray/master/inst
 
 # 查看客户端配置
 
-`cat ~/v2ray_info.txt`
+`cat /usr/local/vmess_qr.json`
 
 
 # 启动方式
