@@ -1,8 +1,8 @@
 # V2Ray 基于 Nginx  vmess+ws+tls 一键安装脚本 （Use Path）
 
-# 申明：
-# 此为wulabing/V2Ray_ws-tls_bash_onekey 的另一个算是魔改的版本
-# [源作者网址](https://github.com/wulabing/V2Ray_ws-tls_bash_onekey):https://github.com/wulabing/V2Ray_ws-tls_bash_onekey
+申明:
+此为wulabing/V2Ray_ws-tls_bash_onekey 的另一个算是魔改的版本
+[源作者网址](https://github.com/wulabing/V2Ray_ws-tls_bash_onekey):https://github.com/wulabing/V2Ray_ws-tls_bash_onekey
 
 ## V2ray core 更新方式
 执行：
