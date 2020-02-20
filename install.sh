@@ -46,7 +46,7 @@ v2ray_access_log="/var/log/v2ray/access.log"
 v2ray_error_log="/var/log/v2ray/error.log"
 amce_sh_file="/root/.acme.sh/acme.sh"
 ssl_update_file="/usr/bin/ssl_update.sh"
-nginx_version="1.16.1"
+nginx_version="1.17.8"
 openssl_version="1.1.1d"
 jemalloc_version="5.2.1"
 shell_mode="ws"
@@ -385,6 +385,7 @@ nginx_install(){
     cd ../nginx-${nginx_version}
 
     ./configure --prefix="${nginx_dir}"                         \
+	        --with-ipv6                                         \
             --with-http_ssl_module                              \
             --with-http_gzip_static_module                      \
             --with-http_stub_status_module                      \
@@ -474,7 +475,8 @@ nginx_conf_add(){
     touch ${nginx_conf_dir}/v2ray.conf
     cat>${nginx_conf_dir}/v2ray.conf<<EOF
     server {
-        listen 443 ssl http2;
+        listen 443 ssl http2 spdy;
+        listen [::]:443 ssl http2 spdy;		
         ssl_certificate       /data/v2ray.crt;
         ssl_certificate_key   /data/v2ray.key;
         ssl_protocols         TLSv1.3;
@@ -499,6 +501,7 @@ nginx_conf_add(){
 }
     server {
         listen 80;
+        listen [::]:80;
 		server_tokens off;
         server_name serveraddr.com;
         return 301 https://use.shadowsocksr.win\$request_uri;
@@ -671,7 +674,7 @@ tls_type(){
         echo "请选择支持的 TLS 版本（default:3）:"
         echo "请注意,如果你使用 Quantaumlt X / 路由器 / 旧版 Shadowrocket / 低于 4.18.1 版本的 V2ray core 请选择 兼容模式"
         echo "1: TLS1.1 TLS1.2 and TLS1.3（兼容模式）"
-        echo "2: TLS1.2 and TLS1.3 (兼容模式)"
+        echo "2: TLS1.2 and TLS1.3 (兼容模式 个人建议选择)"
         echo "3: TLS1.3 only"
         read -p  "请输入：" tls_version
         [[ -z ${tls_version} ]] && tls_version=3
