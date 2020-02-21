@@ -29,7 +29,9 @@
   "outbounds": [
     {
       "protocol": "freedom", 
-      "settings": { }, 
+      "settings": {
+        "domainStrategy": "UseIP"
+	  }, 
       "tag": "direct"
     }, 
     {
@@ -40,9 +42,18 @@
   ], 
   "dns": {
     "servers": [
-	"https://1.1.1.1/dns-query",
-	"https://dns.google/dns-query",
-	"https://1.0.0.1/dns-query",
+	"https+local://1.1.1.1/dns-query",
+	"https+local://1.0.0.1/dns-query",
+	"https+local://cloudflare-dns.com/dns-query",
+	"https+local://dns.google/dns-query",
+	"https+local://dns.google/resolve",
+	
+	//ipv6 DNS over HTTPS
+	//"https+local://[2606:4700:4700::1111]/dns-query",
+	//"https+local://[2606:4700:4700::1001]/dns-query",
+	//"https+local://[2001:4860:4860::64]/dns-query",
+	//"https+local://[2001:4860:4860::6464]/dns-query",
+	
 	"1.1.1.1",
 	"1.0.0.1",
 	"8.8.8.8",
@@ -51,7 +62,7 @@
     ]
   },
   "routing": {
-    "domainStrategy": "AsIs",
+    "domainStrategy": "IPOnDemand",
     "rules": [
       {
         "type": "field",
