@@ -717,6 +717,19 @@ enable_process_systemd(){
     fi
 
 }
+
+#debian 系 9 10 适配
+#rc_local_initialization(){
+#    if [[ -f /etc/rc.local ]];then
+#        chmod +x /etc/rc.local
+#    else
+#        touch /etc/rc.local && chmod +x /etc/rc.local
+#        echo "#!/bin/bash" >> /etc/rc.local
+#        systemctl start rc-local
+#    fi
+#
+#    judge "rc.local 配置"
+#}
 acme_cron_update(){
     wget -N -P /usr/bin --no-check-certificate "https://raw.githubusercontent.com/2444989513/v2ray/master/ssl_update.sh"
     if [[ "${ID}" == "centos" ]];then
