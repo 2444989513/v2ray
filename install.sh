@@ -385,7 +385,7 @@ nginx_install(){
     cd ../nginx-${nginx_version}
 
     ./configure --prefix="${nginx_dir}"                         \
-	        --with-ipv6                                         \
+	    --with-ipv6                                         \
             --with-http_ssl_module                              \
             --with-http_gzip_static_module                      \
             --with-http_stub_status_module                      \
@@ -407,7 +407,7 @@ nginx_install(){
     sed -i 's/worker_processes  1;/worker_processes  3;/' ${nginx_dir}/conf/nginx.conf
     sed -i 's/    worker_connections  1024;/    worker_connections  4096;/' ${nginx_dir}/conf/nginx.conf
     sed -i '$i include conf.d/*.conf;' ${nginx_dir}/conf/nginx.conf
-	sed -i '$i server_tokens off;' ${nginx_dir}/conf/nginx.conf
+    sed -i '$i server_tokens off;' ${nginx_dir}/conf/nginx.conf
 
 
 
@@ -485,8 +485,8 @@ nginx_conf_add(){
         index index.html index.htm;
         root  /home/wwwroot/250;
         error_page 400 = /400.html;
-		add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
-		server_tokens off;
+        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+	server_tokens off;
         location /ray/
         {
         proxy_redirect off;
@@ -502,7 +502,7 @@ nginx_conf_add(){
     server {
         listen 80;
         listen [::]:80;
-		server_tokens off;
+	server_tokens off;
         server_name serveraddr.com;
         return 301 https://use.shadowsocksr.win\$request_uri;
     }
