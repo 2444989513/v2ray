@@ -767,16 +767,15 @@ hhhhcha_OCSP(){
         read -r -p "请输入：" hhhhcha_OCSP
         case $hhhhcha_OCSP in
             [yY][eE][sS]|[yY])
-			    cha_OCSP
-               	;;
+                cha_OCSP
+                ;;
             *)
-        		;;
+                ;;
 esac
 
 }
 
 cha_OCSP(){
-
     if [[ -d /chainedOCSP ]];then
         rm -rf /chainedOCSP
     fi
@@ -788,7 +787,7 @@ cha_OCSP(){
     sed -i 's/#ssl_stapling            on;/ssl_stapling            on;/' ${nginx_dir}/conf/conf.d/v2ray.conf
     sed -i 's/#ssl_stapling_verify     on;/ssl_stapling_verify     on;/' ${nginx_dir}/conf/conf.d/v2ray.conf
     sed -i 's/#ssl_trusted_certificate/ssl_trusted_certificate/' ${nginx_dir}/conf/conf.d/v2ray.conf
-    judge "Nginx 配置修改 开启 OCSP Stapling "
+    judge "Nginx 配置修改 开启 OCSP 装订 "
 
     systemctl restart nginx
     judge "Nginx 重启"
