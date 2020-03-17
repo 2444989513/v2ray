@@ -544,6 +544,14 @@ nginx_conf_add(){
         #ssl_stapling            on;
         #ssl_stapling_verify     on;
         #ssl_trusted_certificate  /chainedOCSP/chain.pem;
+        
+        ssl_session_tickets    off;
+        ssl_prefer_server_ciphers   on;
+        ssl_buffer_size      4k;
+        ssl_session_cache       shared:SSL:50m;
+        ssl_session_timeout     1d;
+        ssl_ecdh_curve    X25519:prime256v1;
+        
         server_tokens off;
         location /ray/
         {
