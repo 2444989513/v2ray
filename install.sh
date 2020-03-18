@@ -407,6 +407,10 @@ nginx_install(){
     sed -i '$i include conf.d/*.conf;' ${nginx_dir}/conf/nginx.conf
     sed -i '$i server_tokens off;' ${nginx_dir}/conf/nginx.conf
 
+    echo 'PATH=$PATH:/etc/nginx/sbin' | sudo tee -a /etc/profile
+    echo 'export PATH' | sudo tee -a /etc/profile
+    source /etc/profile
+
     # 删除临时文件
     rm -rf ../nginx-"${nginx_version}"
     rm -rf ../openssl-"${openssl_version}"
