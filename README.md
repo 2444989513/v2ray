@@ -1,6 +1,6 @@
 # V2Ray 基于 Nginx  vmess+ws+tls 一键安装脚本 （Use Path）
 
-申明:
+# 申明:
 
 此为wulabing/V2Ray_ws-tls_bash_onekey 的另一个算是魔改的版本
 
